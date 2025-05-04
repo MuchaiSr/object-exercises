@@ -342,4 +342,78 @@ multiplyNumeric(menu);
     return student[`grade`] >= 70 && (student.name.startsWith(`J`) || student.name.startsWith(`O`)) && student.name.length > 4;
   });
   console.log(tripleFilter);
+})(); 
+
+(() => {
+  const students = [
+    { name: "Liam", grade: 85 },
+    { name: "Olivia", grade: 92 },
+    { name: "Noah", grade: 76 },
+    { name: "Emma", grade: 59 },
+    { name: "Ava", grade: 48 }
+  ];
+
+  const totalSum = students.reduce((acc, current, index, arr) => { // Think of the accumulator(acc) as a box where you put your results for each iteration.
+    // It is also important that you consider the parameters getting involved with operations involving the method reduce().
+    // The parameters can be custom but they must follow the syntax logic as shown above.
+    if (current[`grade`] >= 60) {
+      return acc + current[`grade`];
+    } else { // In these operations, it is vital that else statements exist because an omission of the else statement could break your operation.
+      return acc;
+    }
+  }, 0 /* initial value */); // Remember to always include the initial value as it informs the accumulator and it's also part of the syntax. 
+
+  console.log(totalSum);
 })();
+
+(() => {
+  const students = [
+    { name: "Liam", grade: 85 },
+    { name: "Olivia", grade: 92 },
+    { name: "Noah", grade: 76 },
+    { name: "Emma", grade: 59 },
+    { name: "Ava", grade: 48 },
+    { name: "John", grade: 65 },
+    { name: "Zoe", grade: 80 }
+  ];
+
+  const above60 = [];
+  const totalSumOfAbove60 = students.reduce((acc, student) => {
+    if (student[`grade`] >= 60) {
+      above60.push(student);
+      console.log(above60);
+
+      return acc + student[`grade`];
+    } else {
+      return acc;
+    }
+  }, 0);
+
+  const averageGrade = totalSumOfAbove60 / above60.length;
+  console.log(averageGrade);
+})();
+
+(() => {
+  const students = [
+    { name: "Liam", grade: 85 },
+    { name: "Olivia", grade: 92 },
+    { name: "Noah", grade: 76 },
+    { name: "Emma", grade: 59 },
+    { name: "Ava", grade: 48 },
+    { name: "John", grade: 65 },
+    { name: "Zoe", grade: 80 }
+  ];
+ const totalSumOfAbove60 = students.reduce((acc, student) => {
+  if (student[`grade`] >= 60) {
+    return {
+      sum: acc.sum + student[`grade`],
+      count: acc.count + 1
+    }
+  } else {
+    return acc.sum; 
+  }
+ }, {sum: 0, count: 0});
+
+ const averageGrade = totalSumOfAbove60.sum / totalSumOfAbove60.count;
+ console.log(averageGrade);
+})(); 
