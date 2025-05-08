@@ -446,7 +446,6 @@ multiplyNumeric(menu);
 })();
 
 (() => {
-  console.log(`I'm here`);
   const students = [
     { name: "Liam", grade: 85 },
     { name: "Olivia", grade: 92 },
@@ -475,4 +474,72 @@ multiplyNumeric(menu);
   }, {});
 
   console.log(studentGrouping);
+})();
+
+(() => { // This code is not as efficient as it could be especially if I was to work on larger arrays but for now it works.
+  console.log(`I'm here`);
+  const students = [
+    { name: "Liam", grade: 85 },
+    { name: "Olivia", grade: 92 },
+    { name: "Noah", grade: 76 },
+    { name: "Emma", grade: 59 },
+    { name: "Ava", grade: 48 },
+    { name: "John", grade: 65 },
+    { name: "Zoe", grade: 80 }
+  ];
+
+  const studentGrouping = students.reduce((acc, student) => {
+    if(student[`grade`] >= 80) {
+      acc.A = acc.A || {names: [], count: 0}; // The || statement is a very important tool if you are going to avoid any instance of overwriting.
+      // Remember how it works i.e it picks the first truthy value and so if you give JS clear instructions on what it should do, in this case, using the or operator, then things will be much better.
+      acc.A.names.push(student[`name`]);
+      acc.A.count++
+    } else if(student[`grade`] >= 60 && student[`grade`] < 79) {
+      acc.B = acc.B || {names: [], count: 0}; // It is important that you think about nested objects.
+      // This is a simple illustration of how you create an object inside another object.
+      // Remember that you can manipulate the values within an object so do not overthink it.
+      acc.B.names.push(student[`name`]);
+      acc.B.count++;
+    } else {
+      acc.F = acc.F || {names: [], count: 0};
+      acc.F.names.push(student[`name`]);
+      acc.F.count++;
+    }
+    return acc;
+  }, {});
+
+  console.log(studentGrouping);
+})();
+
+(() => {
+  const employees = [
+    { name: "Alice", salary: 120000 },
+    { name: "Bob", salary: 75000 },
+    { name: "Charlie", salary: 30000 },
+    { name: "Diana", salary: 95000 },
+    { name: "Eve", salary: 40000 },
+    { name: "Frank", salary: 150000 }
+  ];
+
+  function getSalaryBracket(salary) {
+    if (salary >= 100000) {
+      return `High`;
+    } else if(salary >= 50000 && salary < 100000) {
+      return `Medium`;
+    } else {
+      return `Low`;
+    }
+  }
+
+  const employeeGrouping = employees.reduce((acc, employee) => {
+    const salaryBracket = getSalaryBracket(employee[`salary`]);
+
+    acc[salaryBracket] = acc[salaryBracket] || {names: [], count:0};
+    acc[salaryBracket].names.push(employee[`name`]);
+    acc[salaryBracket].count++
+
+    return acc; // DO NOT FORGET!
+  }, {}); 
+  
+  console.log(employeeGrouping);
 })();
