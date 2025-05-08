@@ -410,10 +410,69 @@ multiplyNumeric(menu);
       count: acc.count + 1
     }
   } else {
-    return acc.sum; 
+    return acc; 
   }
  }, {sum: 0, count: 0});
 
  const averageGrade = totalSumOfAbove60.sum / totalSumOfAbove60.count;
  console.log(averageGrade);
 })(); 
+
+(() => {
+  const students = [
+    { name: "Liam", grade: 85 },
+    { name: "Olivia", grade: 92 },
+    { name: "Noah", grade: 76 },
+    { name: "Emma", grade: 59 },
+    { name: "Ava", grade: 48 },
+    { name: "John", grade: 65 },
+    { name: "Zoe", grade: 80 }
+  ];
+  
+  const averageGrade = students.reduce((acc, student) => {
+    if(student.name.endsWith(`a`) && student[`grade`] >= 50) {
+      return {
+        sum: acc.sum + student[`grade`],
+        count: acc.count + 1
+      }
+    }  
+      return acc;
+  }, {sum: 0, count: 0}); // It is important that you consider how this object can be a very vital tool.
+  // It is being used to calculate the average in this case but it does so with a level of scalability that is proper.
+  // Please also note how the object is being used in the return statement.
+
+  const result = averageGrade.sum / averageGrade.count;
+  console.log(result);
+})();
+
+(() => {
+  console.log(`I'm here`);
+  const students = [
+    { name: "Liam", grade: 85 },
+    { name: "Olivia", grade: 92 },
+    { name: "Noah", grade: 76 },
+    { name: "Emma", grade: 59 },
+    { name: "Ava", grade: 48 },
+    { name: "John", grade: 65 },
+    { name: "Zoe", grade: 80 }
+  ];
+
+  const studentGrouping = students.reduce((acc, student) => {
+    if(student[`grade`] >= 80) {
+      acc.A = acc.A || [];
+      acc.A.push(student[`name`]); 
+    } else if (student[`grade`] >= 60 && student[`grade`] < 79) {
+      acc.B = acc.B || [];
+      acc.B.push(student[`name`]);
+    } else {
+      acc.F = acc.F || [];
+      acc.F.push(student[`name`]);
+    } 
+      return acc; // You must always return the full accumulator (acc) no matter what happens inside the callback.
+      // It is important to consider why this statement is important at this point.
+      // It does not necessarily need to be in an else statement just to avoid any instance of confusion.
+      // But it is an important statement to have 
+  }, {});
+
+  console.log(studentGrouping);
+})();
