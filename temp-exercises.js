@@ -103,6 +103,7 @@ console.log(`author` in book);
       });
 
       for(let key in classroom) { // The other way a loop is used when dealing with objects.
+        // for...in loops iterate over the key-value pair of an object while for...of loops only iterate over the value of an object.
         if (key === `students`) {
             for (let i = 0; i < classroom[key].length; i++) {
                 const addedScores = classroom[key][i][`scores`][`exam1`] + classroom[key][i][`scores`][`exam2`] + classroom[key][i][`scores`][`exam3`];
@@ -477,7 +478,6 @@ multiplyNumeric(menu);
 })();
 
 (() => { // This code is not as efficient as it could be especially if I was to work on larger arrays but for now it works.
-  console.log(`I'm here`);
   const students = [
     { name: "Liam", grade: 85 },
     { name: "Olivia", grade: 92 },
@@ -490,7 +490,7 @@ multiplyNumeric(menu);
 
   const studentGrouping = students.reduce((acc, student) => {
     if(student[`grade`] >= 80) {
-      acc.A = acc.A || {names: [], count: 0}; // The || statement is a very important tool if you are going to avoid any instance of overwriting.
+      acc.A = acc.A || {names: [], count: 0}; // The || operator is a very important tool if you are going to avoid any instance of overwriting.
       // Remember how it works i.e it picks the first truthy value and so if you give JS clear instructions on what it should do, in this case, using the or operator, then things will be much better.
       acc.A.names.push(student[`name`]);
       acc.A.count++
@@ -542,4 +542,448 @@ multiplyNumeric(menu);
   }, {}); 
   
   console.log(employeeGrouping);
+})();
+
+(() => {
+  const employees = [
+    { name: "Alice", salary: 120000 },
+    { name: "Bob", salary: 75000 },
+    { name: "Charlie", salary: 30000 },
+    { name: "Diana", salary: 95000 },
+    { name: "Eve", salary: 40000 },
+    { name: "Frank", salary: 150000 }
+  ];
+
+  const transformEmployees = employees.reduce((acc, employee) => {
+    acc[employee[`name`]] = employee[`salary`];
+    return acc;
+  }, {});
+
+  console.log(transformEmployees);
+})();
+
+(() => {
+  const products = [
+    { name: "Laptop", category: "Electronics" },
+    { name: "TV", category: "Electronics" },
+    { name: "Shoes", category: "Clothing" },
+    { name: "Shirt", category: "Clothing" },
+    { name: "Fridge", category: "Appliances" },
+    { name: "Oven", category: "Appliances" },
+    { name: "Blender", category: "Appliances" }
+  ];
+
+  function getProductCategory(product) {
+    if(product === `Electronics`) {
+      return `Electronics`;
+    } else if (product === `Clothing`) {
+      return `Clothing`;
+    } else {
+      return `Appliances`;
+    }
+  }
+
+  const productCategory = products.reduce((acc, product) => {
+    const category = getProductCategory(product.category);
+
+    acc[category] = acc[category] || {names: [], count: 0};
+    acc[category].names.push(product.name);
+    acc[category].count++;
+    return acc;
+  }, {});
+
+  console.log(productCategory);
+})();
+
+(() => {
+  const products = [
+  { name: "Laptop", category: "Electronics", price: 1200 },
+  { name: "TV", category: "Electronics", price: 800 },
+  { name: "Shoes", category: "Clothing", price: 60 },
+  { name: "Shirt", category: "Clothing", price: 40 },
+  { name: "Fridge", category: "Appliances", price: 1500 },
+  { name: "Oven", category: "Appliances", price: 700 },
+  { name: "Blender", category: "Appliances", price: 100 }
+];
+
+function getPriceRange(price) {
+  if (price >= 1000) {
+    return `Premium`;
+  } else if(price >= 100 && price < 1000) {
+    return `Midrange`;
+  } else {
+    return `Budget`;
+  }
+}
+
+const categoryByPrice = products.reduce((acc, product) => {
+  const priceCategory = getPriceRange(product.price);
+
+  acc[priceCategory] = acc[priceCategory] || {names: [], count: 0};
+  acc[priceCategory].names.push(product.name);
+  acc[priceCategory].count++;
+  return acc;
+}, {});
+
+console.log(categoryByPrice);
+})();
+
+(() => {
+  const products = [
+  { name: "Laptop", category: "Electronics", price: 1200 },
+  { name: "TV", category: "Electronics", price: 800 },
+  { name: "Shoes", category: "Clothing", price: 60 },
+  { name: "Shirt", category: "Clothing", price: 40 },
+  { name: "Fridge", category: "Appliances", price: 1500 },
+  { name: "Oven", category: "Appliances", price: 700 },
+  { name: "Blender", category: "Appliances", price: 100 }
+];
+
+function getProductCategory(category) {
+  if(category === `Electronics`) {
+    return `Electronics`;
+  } else if(category === `Clothing`) {
+    return `Clothing`;
+  } else {
+    return `Appliances`;
+  }
+}
+
+function getPriceRange(price) {
+    if (price >= 1000) {
+    return `Premium`;
+  } else if(price >= 100 && price < 1000) {
+    return `Midrange`;
+  } else {
+    return `Budget`;
+  }
+}
+
+const generalProductCategory = products.reduce((acc, product) => {
+  const productCategory = getProductCategory(product.category);
+  const priceCategory = getPriceRange(product.price);
+ 
+  acc[productCategory] = acc[productCategory] || {};
+  acc[productCategory][priceCategory] = acc[productCategory][priceCategory] || {names: [], count: 0};
+
+  acc[productCategory][priceCategory].names.push(product.name);
+  acc[productCategory][priceCategory].count++;
+  return acc;
+}, {});
+
+console.log(generalProductCategory);
+})();
+
+(() => {
+  const products = [
+  { name: "Laptop", category: "Electronics", price: 1200 },
+  { name: "TV", category: "Electronics", price: 800 },
+  { name: "Shoes", category: "Clothing", price: 60 },
+  { name: "Shirt", category: "Clothing", price: 40 },
+  { name: "Fridge", category: "Appliances", price: 1500 },
+  { name: "Oven", category: "Appliances", price: 700 },
+  { name: "Blender", category: "Appliances", price: 100 }
+];
+
+function getProductCategory(category) {
+  if(category === `Electronics`) {
+    return `Electronics`;
+  } else if(category === `Clothing`) {
+    return `Clothing`;
+  } else {
+    return `Appliances`;
+  }
+}
+
+function getPriceRange(price) {
+  if (price >= 1000) {
+    return `Premium`;
+  } else if(price >= 100 && price < 1000) {
+    return `Midrange`;
+  } else {
+    return `Budget`;
+  }
+}
+
+const generalProductCategory = products.reduce((acc, product) => {
+  const productCategory = getProductCategory(product.category);
+  const priceCategory = getPriceRange(product.price);
+  
+  acc[productCategory] = acc[productCategory] || {};
+  acc[productCategory][priceCategory] = acc[productCategory][priceCategory] || {names: [], count: 0, totalPrice: 0};
+  acc[productCategory][priceCategory].names.push(product.name);
+  acc[productCategory][priceCategory].count++;
+  acc[productCategory][priceCategory].totalPrice += product.price;
+  return acc;
+}, {});
+
+console.log(generalProductCategory);
+})();
+
+(() => {
+  const products = [
+  { name: "Laptop", category: "Electronics", price: 1200 },
+  { name: "TV", category: "Electronics", price: 800 },
+  { name: "Shoes", category: "Clothing", price: 60 },
+  { name: "Shirt", category: "Clothing", price: 40 },
+  { name: "Fridge", category: "Appliances", price: 1500 },
+  { name: "Oven", category: "Appliances", price: 700 },
+  { name: "Blender", category: "Appliances", price: 100 }
+];
+
+function getProductCategory(category) {
+  if(category === `Electronics`) {
+    return `Electronics`;
+  } else if(category === `Clothing`) {
+    return `Clothing`;
+  } else {
+    return `Appliances`;
+  }
+}
+
+function getPriceRange(price) {
+  if (price >= 1000) {
+    return `Premium`;
+  } else if(price >= 100 && price < 1000) {
+    return `Midrange`;
+  } else {
+    return `Budget`;
+  }
+}
+
+const generalProductCategory = products.reduce((acc, product) => {
+  const productCategory = getProductCategory(product.category);
+  const priceCategory = getPriceRange(product.price);
+  
+  acc[productCategory] = acc[productCategory] || {};
+  acc[productCategory][priceCategory] = acc[productCategory][priceCategory] || {names: [], count: 0, totalPrice: 0, averagePrice: 0};
+  acc[productCategory][priceCategory].names.push(product.name);
+  acc[productCategory][priceCategory].count++;
+  acc[productCategory][priceCategory].totalPrice += product.price;
+  acc[productCategory][priceCategory].averagePrice = (acc[productCategory][priceCategory].totalPrice) / (acc[productCategory][priceCategory].count);
+  return acc;
+}, {});
+
+console.log(generalProductCategory);
+})();
+
+(() => {
+  const products = [
+  { name: "Laptop", category: "Electronics", price: 1200 },
+  { name: "TV", category: "Electronics", price: 800 },
+  { name: "Shoes", category: "Clothing", price: 60 },
+  { name: "Shirt", category: "Clothing", price: 40 },
+  { name: "Fridge", category: "Appliances", price: 1500 },
+  { name: "Oven", category: "Appliances", price: 700 },
+  { name: "Blender", category: "Appliances", price: 100 }
+];
+
+function getProductCategory(category) {
+  if(category === `Electronics`) {
+    return `Electronics`;
+  } else if(category === `Clothing`) {
+    return `Clothing`;
+  } else {
+    return `Appliances`;
+  }
+}
+
+function getPriceRange(price) {
+  if (price >= 1000) {
+    return `Premium`;
+  } else if(price >= 100 && price < 1000) {
+    return `Midrange`;
+  } else {
+    return `Budget`;
+  }
+}
+
+const generalProductCategory = products.reduce((acc, product) => {
+  const productCategory = getProductCategory(product.category);
+  const priceCategory = getPriceRange(product.price);
+  
+  acc[productCategory] = acc[productCategory] || {};
+  acc[productCategory][priceCategory] = acc[productCategory][priceCategory] || {names: [], count: 0, totalPrice: 0, averagePrice: 0,};
+  acc[productCategory][priceCategory].names.push(product.name);
+  acc[productCategory][priceCategory].count++;
+  acc[productCategory][priceCategory].totalPrice += product.price;
+  acc[productCategory][priceCategory].averagePrice = (acc[productCategory][priceCategory].totalPrice) / (acc[productCategory][priceCategory].count);
+
+  if (!acc[productCategory][priceCategory].mostExpensive || product.price > acc[productCategory][priceCategory].mostExpensive.price) { // This statement is worth considering a lot.
+  acc[productCategory][priceCategory].mostExpensive = { name: product.name, price: product.price };
+}
+
+  return acc;
+}, {});
+
+console.log(generalProductCategory);
+})();
+
+(() => {
+  const products = [
+  { name: "Laptop", category: "Electronics", price: 1200, stock: 25 },
+  { name: "TV", category: "Electronics", price: 800, stock: 5 },
+  { name: "Shoes", category: "Clothing", price: 60, stock: 0 },
+  { name: "Shirt", category: "Clothing", price: 40, stock: 18 },
+  { name: "Fridge", category: "Appliances", price: 1500, stock: 8 },
+  { name: "Oven", category: "Appliances", price: 700, stock: 3 },
+  { name: "Blender", category: "Appliances", price: 100, stock: 0 }
+];
+
+function getProductCategory(category) {
+  if(category === `Electronics`) {
+    return `Electronics`;
+  } else if(category === `Clothing`) {
+    return `Clothing`;
+  } else {
+    return `Appliances`;
+  }
+}
+
+function getStockLevel(stock) {
+  if(stock > 10) {
+    return `In Stock`;
+  } else if(stock >= 1 && stock <= 10) {
+    return `Low Stock`;
+  } else {
+    return `Out of Stock`;
+  }
+}
+
+const generalProductCategory = products.reduce((acc, product) => {
+  const productCategory = getProductCategory(product.category);
+  const stockCategory = getStockLevel(product.stock);
+
+  acc[productCategory] = acc[productCategory] || {};
+  acc[productCategory][stockCategory] = acc[productCategory][stockCategory] || {names: [], count: 0};
+  acc[productCategory][stockCategory].names.push(product.name);
+  acc[productCategory][stockCategory].count++;
+  return acc;
+}, {});
+
+console.log(generalProductCategory);
+})();
+
+(() => { // Object.entries().
+// Object.entries(obj) converts an object into an array of [key, value] pairs.
+// It lets you loop over object keys and values at the same time.
+  const products = [
+  { name: "Laptop", category: "Electronics", price: 1200, stock: 25 },
+  { name: "TV", category: "Electronics", price: 800, stock: 5 },
+  { name: "Shoes", category: "Clothing", price: 60, stock: 0 },
+  { name: "Shirt", category: "Clothing", price: 40, stock: 18 },
+  { name: "Fridge", category: "Appliances", price: 1500, stock: 8 },
+  { name: "Oven", category: "Appliances", price: 700, stock: 3 },
+  { name: "Blender", category: "Appliances", price: 100, stock: 0 }
+];
+
+function getProductCategory(category) {
+  if(category === `Electronics`) {
+    return `Electronics`;
+  } else if(category === `Clothing`) {
+    return `Clothing`;
+  } else {
+    return `Appliances`;
+  }
+}
+
+function getStockLevel(stock) {
+  if(stock > 10) {
+    return `In Stock`;
+  } else if(stock >= 1 && stock <= 10) {
+    return `Low Stock`;
+  } else {
+    return `Out of Stock`;
+  }
+}
+
+const generalProductCategory = products.reduce((acc, product) => {
+  const productCategory = getProductCategory(product.category);
+  const stockCategory = getStockLevel(product.stock);
+
+  acc[productCategory] = acc[productCategory] || {};
+  acc[productCategory][stockCategory] = acc[productCategory][stockCategory] || {names: [], count: 0};
+  acc[productCategory][stockCategory].names.push(product.name);
+  acc[productCategory][stockCategory].count++;
+  return acc;
+}, {});
+
+console.log(generalProductCategory);
+
+for(const [category, stockData] of Object.entries(generalProductCategory)) {
+    console.log(`Category: ${category}`);
+    console.log(`stock Data: ${category.stockData}`);
+for(const [stockLevel, stockInfo] of Object.entries(stockData)) {
+  console.log(`Stock Level: ${stockLevel}`);
+  console.log(`Total Number of Products: ${stockInfo.count}`);
+  console.log(`Name: ${stockInfo.names}`);
+}
+}
+})();
+
+(() => { // Array and Object destructuring
+  const [banana, monkey] = ["color", "blue"]; // Note how array destructuring works here.
+  // This is different from object destructuring because with object destructuring, there is a strictness involved with regard to the variable names.
+  // If you think about this array as the result of a destructuring operation using Object.entries(), you see how you can utilize array destructuring to call a particular value.
+
+console.log(banana);   // "color"
+console.log(monkey); // "blue"
+
+const item = { color: "blue", size: "medium" };
+
+// In contrast, with regard to Object destructuring, you must use the actual key names:
+const { color, size } = item;
+
+console.log(color); // "blue"
+console.log(size);  // "medium"
+
+})();
+
+(() => {
+  console.log(`i'm here`);
+  const customers = [ // It is important to consider the power of arrays and Objects in this block. 
+  {
+    name: "Alice",
+    orders: [
+      { product: "Laptop", quantity: 1, unitPrice: 1200 },
+      { product: "Mouse", quantity: 2, unitPrice: 25 }
+    ]
+  },
+  {
+    name: "Bob",
+    orders: [
+      { product: "TV", quantity: 1, unitPrice: 800 },
+      { product: "Headphones", quantity: 3, unitPrice: 100 }
+    ]
+  },
+  {
+    name: "Charlie",
+    orders: [
+      { product: "Shoes", quantity: 2, unitPrice: 60 }
+    ]
+  }
+];
+
+customers.forEach((object) => {
+  const customerDisplay = object.orders.reduce((acc, order) => {
+    acc.name = object.name;
+    acc.totalItemsOrdered = acc.totalItemsOrdered || 0;
+    const quantity = acc.totalItemsOrdered += order.quantity;
+
+    acc.totalSpent = acc.totalSpent || 0;
+    const unitPrice = acc.totalSpent += order.unitPrice;
+
+    acc.totalSpending = acc.totalSpending || 0;
+    acc.totalSpending = quantity * unitPrice;
+
+    acc.highestOrderValue = acc.highestOrderValue || 0;
+    if(order.unitPrice > acc.highestOrderValue) acc.highestOrderValue = order.unitPrice;
+    return acc;
+  }, {});
+
+  console.log(`Name: ${customerDisplay.name}`);
+  console.log(`Total Spending: ${customerDisplay.totalSpending}`);
+  console.log(`Total Items Ordered: ${customerDisplay.totalItemsOrdered}`);
+  console.log(`Highest Order Value: ${customerDisplay.highestOrderValue}`);
+});
 })();
