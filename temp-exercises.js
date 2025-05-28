@@ -1166,8 +1166,8 @@ const orderDisplay = orders.reduce((acc, order) => {
   acc[productCategory].totalQuantity += order.quantity;
   acc[productCategory].quantityFrequency[order.quantity] = (acc[productCategory].quantityFrequency[order.quantity] || 0) + 1; // Why this logic works: What I am trying to do is count how many times a number/the quatity appears or in other words, I am trying to track the frequency of the quantity.
   // To do that, I need to manipulate the values in such a manner that the count goes up each time JS gets to a certain quantity.
-  // The above statement creates the property (order.quantity) and just like the other operations where have to first initialize a statement for future purposes(to avoid overwriting), we need to the same here, although now it does not necessarily play the 'avoid overwrite' game. 
-  // Now, what we are trying to do is to have the or(||) operator pick the last value i.e 0 because in the first iteration, undefined exists, and where two falsy values exist, or picks the last value.
+  // The above statement creates the property (order.quantity) and just like the other operations where have to first initialize a statement for future purposes(to avoid overwriting), we need to do the same here, although now it does not necessarily play the 'avoid overwrite' game. 
+  // Now, what we are trying to do is to have the or(||) operator pick the last value i.e 0 because in the first iteration, undefined exists, and where two falsy values exist, or(||) picks the last value.
   // This is then added to 1 and so the second time JS comes across 1, it will see that there exists a value i.e 1 and the logic will make the count increase by 1. 
   return acc;
 }, {});
@@ -1176,7 +1176,6 @@ console.log(orderDisplay);
 })();
 
 (() => {
-  console.log(`I'm here`);
 const orders = [
   { product: "Laptop", quantity: 1 },
   { product: "Mouse", quantity: 2 },
@@ -1198,11 +1197,124 @@ const orderDisplay = orders.reduce((acc, order) => {
   return acc;
 }, {});
 
-const result = Object.entries(orderDisplay).filter((array) => {
-  for (const value in array[1].quantityFrequency) {
-    if(value >= 3) return array;
+const result = Object.entries(orderDisplay).filter((array) => { // Remember this: Object.entries is a method that is used to convert an object into an array.
+  // This is mighty important for when to use array methods over an object but since you cannot use array methods in objects, you need to convert the object into an array.
+  // For example, in the following operation...
+  // const summary = {
+  // Apple: { totalOrders: 3, totalQuantity: 8 },
+  // Banana: { totalOrders: 2, totalQuantity: 5 }
+  // };
+
+  // console.log(Object.entries(summary));... the output will be an array i.e...
+  // [
+  //  ["Apple", { totalOrders: 3, totalQuantity: 8 }],
+  //  ["Banana", { totalOrders: 2, totalQuantity: 5 }]
+  // ]
+
+
+  for (const value in array[1].quantityFrequency) { // Again, for...in goes over the property names i.e keys of an object.
+    // What this means is that if an object has 5 properties it will go through the different properties and will output the keys of the property.
+    // Take the following example...
+    // const obj = { a: 1, b: 2 };
+
+    // for (const key in obj) {
+    // console.log(key); // 'a', then 'b'
+    // console.log(obj[key]); // 1, then 2
+    // }...what will happen here is that the variable that you use inside the loop represents the key of each key-value pair.
+    // But notice that if you wanted to log the actual values, you'd need your Object and then use the variable for the key that you used.
+
+    // It is mainly used with obejects but can also be used with anything that has the key-value pair.
+    // for...of is meant to be used with iterable objects, so arrays or strings or map
+    if(array[1].quantityFrequency[value] >= 3) return array;
   }
 });
 console.log(Object.fromEntries(result));
 console.log(orderDisplay);
+})();
+
+(() => {  // This is a refresher because I took a long break from writing code
+  const fruits = [
+  { name: "Apple", quantity: 2 },
+  { name: "Banana", quantity: 3 },
+  { name: "Apple", quantity: 1 },
+  { name: "Orange", quantity: 1 },
+  { name: "Banana", quantity: 2 },
+  { name: "Apple", quantity: 5 }
+];
+
+const fruitCategories = fruits.reduce((acc, fruit) => {
+  const fruitCategory = fruit.name;
+
+  acc[fruitCategory] = acc[fruitCategory] || {totalOrders: 0, totalQuantity: 0};
+  acc[fruitCategory].totalOrders ++;
+  acc[fruitCategory].totalQuantity  += fruit.quantity;
+  return acc;
+}, {});
+
+console.log(fruitCategories);
+})();
+
+(() => {
+  const bookOrders = [
+  { title: "1984", quantity: 2 },
+  { title: "Brave New World", quantity: 1 },
+  { title: "1984", quantity: 2 },
+  { title: "Fahrenheit 451", quantity: 3 },
+  { title: "1984", quantity: 2 },
+  { title: "Brave New World", quantity: 2 },
+  { title: "Fahrenheit 451", quantity: 3 },
+  { title: "Fahrenheit 451", quantity: 3 },
+];
+
+const bookCategorization = bookOrders.reduce((acc, book) => {
+  const bookTitle = book.title;
+
+  acc[bookTitle] = acc[bookTitle] || {totalOrders: 0, totalQuantity: 0, quantityFrequency: {}};
+  acc[bookTitle].totalOrders ++;
+  acc[bookTitle].totalQuantity += book.quantity;
+  acc[bookTitle].quantityFrequency[book.quantity] = (acc[book.title].quantityFrequency[book.quantity] || 0) + 1;
+  return acc;
+}, {});
+
+console.log(bookCategorization);
+const bookResults = Object.entries(bookCategorization).filter(([_, bookData]) => {
+  for(const quantity in bookData.quantityFrequency) { // The underscore makes it possible to ignore the first item in the array 
+    if (bookData.quantityFrequency[quantity] >= 3) return true;  // obj(key)
+  }
+});
+console.log(Object.fromEntries(bookResults));  // Object.fromEntries is the opposite of Object.entries because it converts an array into an Object.
+})();
+
+(() => {
+  console.log(`I'm here`);
+  const productOrders = [
+  { product: "Book", quantity: 1 },
+  { product: "Pen", quantity: 2 },
+  { product: "Book", quantity: 1 },
+  { product: "Notebook", quantity: 3 },
+  { product: "Pen", quantity: 2 },
+  { product: "Book", quantity: 2 },
+  { product: "Pen", quantity: 2 },
+  { product: "Notebook", quantity: 1 },
+];
+
+const productDisplay = productOrders.reduce((acc, product) => {
+  const productCategory = product.product;
+
+  acc[productCategory] = acc[productCategory] || {totalOrders: 0, totalQuantity: 0, quantityFrequency: {}};
+  acc[productCategory].totalOrders ++;
+  acc[productCategory].totalQuantity += product.quantity;
+  acc[productCategory].quantityFrequency[product.quantity] = (acc[productCategory].quantityFrequency[product.quantity] || 0) + 1;
+  return acc;
+}, {});
+
+const productResults = Object.entries(productDisplay).filter(([product, data]) => { // This constitutes array destructuring where we use variable to represent items in an array.
+  // product represents the different product items in the different arrays and the data represents the  Object.
+  return Object.values(data.quantityFrequency).some((quantityCount) => { // This operation constitutes another way to filter based on frequency other than the operation above.
+    // Object.values converts an Object into an array of values and .some is an array method that works together with the condition that would be written in the block.
+    // It returns true or false depending on whether the condition is met or not met.
+    return quantityCount >= 3;
+  })
+});
+console.log(Object.fromEntries(productResults));
 })();
