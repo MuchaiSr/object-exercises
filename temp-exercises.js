@@ -912,7 +912,6 @@ console.log(generalProductCategory);
 
 for(const [category, stockData] of Object.entries(generalProductCategory)) {
     console.log(`Category: ${category}`);
-    console.log(`stock Data: ${category.stockData}`);
 for(const [stockLevel, stockInfo] of Object.entries(stockData)) {
   console.log(`Stock Level: ${stockLevel}`);
   console.log(`Total Number of Products: ${stockInfo.count}`);
@@ -940,7 +939,6 @@ console.log(size);  // "medium"
 })();
 
 (() => {
-  console.log(`i'm here`);
   const customers = [ // It is important to consider the power of arrays and Objects in this block. 
   {
     name: "Alice",
@@ -986,4 +984,225 @@ customers.forEach((object) => {
   console.log(`Total Items Ordered: ${customerDisplay.totalItemsOrdered}`);
   console.log(`Highest Order Value: ${customerDisplay.highestOrderValue}`);
 });
+})();
+
+(() => {
+  const sales = [
+  { name: "Laptop", unitsSold: 4, pricePerUnit: 1200 },
+  { name: "Mouse", unitsSold: 10, pricePerUnit: 25 },
+  { name: "TV", unitsSold: 3, pricePerUnit: 800 },
+  { name: "Shoes", unitsSold: 6, pricePerUnit: 60 }
+];
+
+const salesDisplay = sales.reduce((acc, sale) => {
+  const revenue = (sale.unitsSold * sale.pricePerUnit);
+  acc.productSummaries.push({name: sale.name, saleRevenue: revenue});
+
+  acc.totalRevenue += revenue;
+  return acc;
+}, { productSummaries: [], totalRevenue: 0 });
+
+console.log(salesDisplay);
+})();
+
+(() => {
+  const orders = [
+  { product: "Laptop", quantity: 1, unitPrice: 1200 },
+  { product: "Mouse", quantity: 2, unitPrice: 25 },
+  { product: "Laptop", quantity: 1, unitPrice: 1200 },
+  { product: "TV", quantity: 1, unitPrice: 800 },
+  { product: "Mouse", quantity: 1, unitPrice: 25 }
+];
+
+function getOrderProducts (product) {
+  if (product === `Laptop`) {
+    return `Laptop`;
+  } else if (product === `Mouse`) {
+    return `Mouse`;
+  } else {
+    return `TV`;
+  }
+}
+
+const orderCategory = orders.reduce((acc, order) => {
+  const productCategory = getOrderProducts(order.product);
+
+  acc[productCategory] = acc[productCategory] || {};
+  acc[productCategory].totalUnits = acc[productCategory].totalUnits || 0;
+  acc[productCategory].totalUnits += order.quantity;
+
+  acc[productCategory].totalRevenue = acc[productCategory].totalRevenue || 0;
+  acc[productCategory].totalRevenue += order.quantity * order.unitPrice;
+  return acc;
+}, {});
+
+console.log(orderCategory);
+})();
+
+(() => {
+  const orders = [
+  { product: "Laptop", quantity: 1, unitPrice: 1200 },
+  { product: "Mouse", quantity: 2, unitPrice: 25 },
+  { product: "Laptop", quantity: 1, unitPrice: 1200 },
+  { product: "TV", quantity: 1, unitPrice: 800 },
+  { product: "Mouse", quantity: 1, unitPrice: 25 },
+  { product: "Mouse", quantity: 3, unitPrice: 25 }
+];
+
+const orderCategory = orders.reduce((acc, order) => {
+  const productCategory = order.product;
+
+  acc[productCategory] = acc[productCategory] || {ordersPlaced: 0, quantity: 0, totalRevenue: 0};
+  acc[productCategory].ordersPlaced ++;
+  acc[productCategory].quantity += order.quantity;
+  acc[productCategory].totalRevenue += order.quantity * order.unitPrice;
+  return acc;
+}, {});
+
+console.log(orderCategory);
+})();
+
+(() => {
+  const orders = [
+  { product: "Laptop", quantity: 1 },
+  { product: "Mouse", quantity: 2 },
+  { product: "Laptop", quantity: 3 },
+  { product: "TV", quantity: 1 },
+  { product: "Mouse", quantity: 1 },
+  { product: "Mouse", quantity: 2 }
+];
+
+const orderCategory = orders.reduce((acc, order) => {
+  const productCategory = order.product;
+
+  acc[productCategory] = acc[productCategory] || { ordersPlaced: 0, totalQuantity: 0, averageQuantityPerOrder: 0};
+  acc[productCategory].totalQuantity += order.quantity;
+  acc[productCategory].ordersPlaced++
+  acc[productCategory].averageQuantityPerOrder = Number((acc[productCategory].totalQuantity / acc[productCategory].ordersPlaced).toFixed(2)); // toFixed(2) is used to round of the number to 2 decimal places and this returns a string. To ensure that the number is a number, you use Number().
+  return acc;
+}, {});
+
+console.log(orderCategory);
+})();
+
+(() => {
+  const orders = [
+  { product: "Laptop", quantity: 1 },
+  { product: "Mouse", quantity: 2 },
+  { product: "Laptop", quantity: 3 },
+  { product: "TV", quantity: 1 },
+  { product: "Mouse", quantity: 1 },
+  { product: "Mouse", quantity: 5 },
+  { product: "TV", quantity: 2 },
+];
+
+const orderDisplay = orders.reduce((acc, order) => {
+  const productCategory = order.product;
+  
+  acc[productCategory] = acc[productCategory] || {totalOrders: 0, totalQuantity: 0, averageQuantity: 0, minQuantity: Infinity, maxQuantity: -Infinity};
+  acc[productCategory].totalOrders ++;
+  acc[productCategory].totalQuantity += order.quantity;
+  acc[productCategory].averageQuantity = Number((acc[productCategory].totalQuantity / acc[productCategory].totalOrders).toFixed(2));
+  acc[productCategory].minQuantity = Math.min(acc[productCategory].minQuantity, order.quantity);
+  acc[productCategory].maxQuantity = Math.max(acc[productCategory].maxQuantity, order.quantity);
+  return acc;
+
+  // The condition !acc[productCategory].minQuantity above checks whether this condition is not a valid truthy value, so this will return true, if a value is falsy.
+  // This has the potential to ruin an operation, and the most fireproof way around this is to use Infinity and -Infinity and the methods Math.min() and Math.max().
+  // Math.min() returns the lowest number among the numbers given and if you were to compare a number with infinity, the other number would be the lowest.
+  // The same is true for the Math.max() method.
+}, {});
+
+console.log(orderDisplay);
+})();
+
+(() => {
+  const orders = [
+  { product: "Laptop", quantity: 1 },
+  { product: "Mouse", quantity: 2 },
+  { product: "Laptop", quantity: 3 },
+  { product: "TV", quantity: 1 },
+  { product: "Mouse", quantity: 1 },
+  { product: "Mouse", quantity: 5 },
+  { product: "TV", quantity: 2 },
+  { product: "Laptop", quantity: 1 }
+];
+
+const orderDisplay = orders.reduce((acc, order) => {
+  const productCategory = order.product;
+
+  acc[productCategory] = acc[productCategory] || {totalOrders: 0, totalQuantity: 0, averageQuantity: 0, minQuantity: Infinity, maxQuantity: -Infinity, uniqueQuantities: []};
+  acc[productCategory].totalOrders ++;
+  acc[productCategory].totalQuantity += order.quantity;
+  acc[productCategory].averageQuantity = Number((acc[productCategory].totalQuantity / acc[productCategory].totalOrders).toFixed(2));
+  acc[productCategory].minQuantity = Math.min(acc[productCategory].minQuantity, order.quantity);
+  acc[productCategory].maxQuantity = Math.max(acc[productCategory].maxQuantity, order.quantity);
+  if(!acc[productCategory].uniqueQuantities.includes(order.quantity)) {
+    acc[productCategory].uniqueQuantities.push(order.quantity);
+  } // A faster way to write conditional statements...!acc[productCategory].uniqueQuantities.includes(order.quantity) ? acc[productCategory].uniqueQuantities.push(order.quantity) : [];
+  return acc;
+}, {});
+
+console.log(orderDisplay);
+})();
+
+(() => {
+  const orders = [
+  { product: "Laptop", quantity: 1 },
+  { product: "Mouse", quantity: 2 },
+  { product: "Laptop", quantity: 3 },
+  { product: "TV", quantity: 1 },
+  { product: "Mouse", quantity: 1 },
+  { product: "Mouse", quantity: 5 },
+  { product: "TV", quantity: 2 },
+  { product: "Laptop", quantity: 1 }
+];
+
+const orderDisplay = orders.reduce((acc, order) => {
+  const productCategory = order.product;
+
+  acc[productCategory] = acc[productCategory] || {totalOrders: 0, totalQuantity: 0, quantityFrequency: {}};
+  acc[productCategory].totalOrders ++;
+  acc[productCategory].totalQuantity += order.quantity;
+  acc[productCategory].quantityFrequency[order.quantity] = (acc[productCategory].quantityFrequency[order.quantity] || 0) + 1; // Why this logic works: What I am trying to do is count how many times a number/the quatity appears or in other words, I am trying to track the frequency of the quantity.
+  // To do that, I need to manipulate the values in such a manner that the count goes up each time JS gets to a certain quantity.
+  // The above statement creates the property (order.quantity) and just like the other operations where have to first initialize a statement for future purposes(to avoid overwriting), we need to the same here, although now it does not necessarily play the 'avoid overwrite' game. 
+  // Now, what we are trying to do is to have the or(||) operator pick the last value i.e 0 because in the first iteration, undefined exists, and where two falsy values exist, or picks the last value.
+  // This is then added to 1 and so the second time JS comes across 1, it will see that there exists a value i.e 1 and the logic will make the count increase by 1. 
+  return acc;
+}, {});
+
+console.log(orderDisplay);
+})();
+
+(() => {
+  console.log(`I'm here`);
+const orders = [
+  { product: "Laptop", quantity: 1 },
+  { product: "Mouse", quantity: 2 },
+  { product: "Laptop", quantity: 3 },
+  { product: "TV", quantity: 1 },
+  { product: "Mouse", quantity: 2 },
+  { product: "Mouse", quantity: 2 },
+  { product: "TV", quantity: 2 },
+  { product: "Laptop", quantity: 1 }
+];
+
+const orderDisplay = orders.reduce((acc, order) => {
+  const productCategory = order.product;
+  
+  acc[productCategory] = acc[productCategory] || {totalOrders: 0, totalQuantity: 0, quantityFrequency: {}};
+  acc[productCategory].totalOrders ++;
+  acc[productCategory].totalQuantity += order.quantity;
+  acc[productCategory].quantityFrequency[order.quantity] = (acc[productCategory].quantityFrequency[order.quantity] || 0) + 1;
+  return acc;
+}, {});
+
+const result = Object.entries(orderDisplay).filter((array) => {
+  for (const value in array[1].quantityFrequency) {
+    if(value >= 3) return array;
+  }
+});
+console.log(Object.fromEntries(result));
+console.log(orderDisplay);
 })();
