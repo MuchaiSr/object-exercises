@@ -1435,5 +1435,6 @@ const customerGrouping = transactions.reduce((acc, transaction) => {
   }
   return acc;
 }, new Map());
-console.log([...customerGrouping.values()].sort((a, b) => b.totalAmount - a.totalAmount)); // Notice that a and b in this case are the objects after conversion to the array.
+console.log([...customerGrouping.values()].sort((a, b) => b.totalAmount - a.totalAmount)); // Notice that a and b in this case are the objects 
+// after conversion to the array.
 })();
