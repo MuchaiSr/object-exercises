@@ -1286,7 +1286,6 @@ console.log(Object.fromEntries(bookResults));  // Object.fromEntries is the oppo
 })();
 
 (() => {
-  console.log(`I'm here`);
   const productOrders = [
   { product: "Book", quantity: 1 },
   { product: "Pen", quantity: 2 },
@@ -1317,4 +1316,124 @@ const productResults = Object.entries(productDisplay).filter(([product, data]) =
   })
 });
 console.log(Object.fromEntries(productResults));
+})();
+
+(() => {
+  const customerOrders = [
+  { customer: "Alice", product: "Book" },
+  { customer: "Bob", product: "Pen" },
+  { customer: "Alice", product: "Notebook" },
+  { customer: "Alice", product: "Pen" },
+  { customer: "Bob", product: "Notebook" },
+  { customer: "Charlie", product: "Book" },
+  { customer: "Bob", product: "Book" },
+];
+
+const orderCategorization = customerOrders.reduce((acc, customer) => {
+  const customerName = customer.customer;
+
+  acc[customerName] = acc[customerName] || {totalOrders: 0, products: []};
+  acc[customerName].totalOrders ++;
+  if (!acc[customerName].products.includes(customer.product))  // It is important that you understand what exactly includes is doing in this part of the statement.
+  // If we take a customer, say Alice to illustrate what's going on...Alice could have ordered a pen 3 times, and so, if we asked products
+  // to push the products that she's ordered, pen will appear 3 times.
+  // In the context of the if statement, what's happening is that JS will be iterating through each customer and will be pushing the products to the array.
+  // When it comes across this statement whose core is founded on the includes method, it will only record the product once.
+  // Uniqueness is used in this context and not being special or anything like that.
+    acc[customerName].products.push(customer.product);
+  return acc;
+}, {});
+
+console.log(orderCategorization);
+})();
+
+(() => {
+  const productOrders = [
+  { customer: "Alice", product: "Book", quantity: 2 },
+  { customer: "Bob", product: "Pen", quantity: 5 },
+  { customer: "Alice", product: "Notebook", quantity: 1 },
+  { customer: "Alice", product: "Pen", quantity: 3 },
+  { customer: "Bob", product: "Notebook", quantity: 2 },
+  { customer: "Charlie", product: "Book", quantity: 4 },
+  { customer: "Bob", product: "Book", quantity: 6 },
+];
+
+const customerGrouping = productOrders.reduce((acc, customer) => {
+  const customerName = customer.customer;
+
+  acc[customerName] = acc[customerName] || {totalOrders: 0, totalQuantity: 0, uniqueProducts: [], quantityFrequency: {}};
+  acc[customerName].totalOrders ++;
+  acc[customerName].totalQuantity += customer.quantity;
+  if (!acc[customerName].uniqueProducts.includes(customer.product)) 
+    acc[customerName].uniqueProducts.push(customer.product);
+  acc[customerName].quantityFrequency[customer.quantity] = (acc[customerName].quantityFrequency[customer.quantity] || 0) + 1;
+  return acc;
+}, {});
+
+console.log(customerGrouping);
+const finalCustomerGrouping = Object.entries(customerGrouping).filter(([names, data]) => {
+  return Object.values(data.quantityFrequency).every((quantity) => {
+    return quantity === 1;
+  }) && data.totalQuantity >= 3;
+});
+
+console.log(Object.fromEntries(finalCustomerGrouping));
+})();
+
+(() => {
+  const productOrders = [
+  { customer: "Alice", product: "Book", quantity: 2 },
+  { customer: "Bob", product: "Pen", quantity: 5 },
+  { customer: "Alice", product: "Notebook", quantity: 1 },
+  { customer: "Alice", product: "Pen", quantity: 3 },
+  { customer: "Bob", product: "Notebook", quantity: 2 },
+  { customer: "Charlie", product: "Book", quantity: 4 },
+  { customer: "Bob", product: "Book", quantity: 6 },
+];
+
+const customerGrouping = productOrders.reduce((acc, customer) => {
+  const customerName = customer.customer;
+
+  acc[customerName] = acc[customerName] || {totalQuantity: 0, uniqueProducts: [], quantityFrequency: {}, productFrequency: {}};
+  acc[customerName].totalQuantity += customer.quantity;
+  if (!acc[customerName].uniqueProducts.includes(customer.product))
+    acc[customerName].uniqueProducts.push(customer.product);
+  acc[customerName].quantityFrequency[customer.quantity] = (acc[customerName].quantityFrequency[customer.quantity] || 0) + 1;
+  acc[customerName].productFrequency[customer.product] = (acc[customerName].productFrequency[customer.product] || 0) + 1;
+  return acc;
+}, {});
+
+console.log(customerGrouping);
+const finalCustomerGrouping = Object.entries(customerGrouping).filter(([names, data]) => {
+  return data.totalQuantity >= 5 && Object.values(data.quantityFrequency).every((count) => count === 1) && 
+  Object.values(data.productFrequency).every((count) => count === 1);
+});
+console.log(finalCustomerGrouping);
+})();
+
+(() => {  // Here we introduce Map as another tool/structure that supports dynamic keys
+  console.log(`I'm here`);
+  const transactions = [
+  { id: 1, customer: "Alice", amount: 25 },
+  { id: 2, customer: "Bob", amount: 40 },
+  { id: 3, customer: "Alice", amount: 35 },
+  { id: 4, customer: "Charlie", amount: 20 },
+  { id: 5, customer: "Bob", amount: 60 },
+  { id: 6, customer: "Alice", amount: 40 },
+];
+
+const customerGrouping = transactions.reduce((acc, transaction) => {
+  const customerName = transaction.customer;
+  const savedValues = acc.get(customerName);
+
+  if (!savedValues) {
+    acc.set( customerName, {customer: transaction.customer, totalAmount: transaction.amount, totalTransactions: 1, averageAmount: transaction.amount});
+  } else {
+    savedValues.totalAmount += transaction.amount;
+    savedValues.totalTransactions ++;
+    savedValues.averageAmount = savedValues.totalAmount / savedValues.totalTransactions;
+  }
+  return acc;
+}, new Map());
+console.log([...customerGrouping.values()].sort((a, b) => b.totalAmount - a.totalAmount)); // Notice that a and b in this case are the objects after conversion to the array.
 })();
