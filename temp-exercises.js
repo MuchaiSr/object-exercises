@@ -103,7 +103,7 @@ console.log(`author` in book);
       });
 
       for(let key in classroom) { // The other way a loop is used when dealing with objects.
-        // for...in loops iterate over the key-value pair of an object while for...of loops only iterate over the value of an object.
+        // for...in loops iterate over the key-value pair of an object while for...of loops only iterate over the value of an iterable object like arrays, nodeLists and Map.
         if (key === `students`) {
             for (let i = 0; i < classroom[key].length; i++) {
                 const addedScores = classroom[key][i][`scores`][`exam1`] + classroom[key][i][`scores`][`exam2`] + classroom[key][i][`scores`][`exam3`];
@@ -1412,7 +1412,6 @@ console.log(finalCustomerGrouping);
 })();
 
 (() => {  // Here we introduce Map as another tool/structure that supports dynamic keys
-  console.log(`I'm here`);
   const transactions = [
   { id: 1, customer: "Alice", amount: 25 },
   { id: 2, customer: "Bob", amount: 40 },
@@ -1427,7 +1426,7 @@ const customerGrouping = transactions.reduce((acc, transaction) => {
   const savedValues = acc.get(customerName);
 
   if (!savedValues) {
-    acc.set( customerName, {customer: transaction.customer, totalAmount: transaction.amount, totalTransactions: 1, averageAmount: transaction.amount});
+    acc.set(customerName, {customer: transaction.customer, totalAmount: transaction.amount, totalTransactions: 1, averageAmount: transaction.amount});
   } else {
     savedValues.totalAmount += transaction.amount;
     savedValues.totalTransactions ++;
@@ -1437,4 +1436,108 @@ const customerGrouping = transactions.reduce((acc, transaction) => {
 }, new Map());
 console.log([...customerGrouping.values()].sort((a, b) => b.totalAmount - a.totalAmount)); // Notice that a and b in this case are the objects 
 // after conversion to the array.
+// It is also worth considering that .values() is a method of a Map and not an array. If you used .values() on an array, you'll not get the desired result.
+})();
+
+(() => {
+  const transactions = [
+  { id: 1, customer: "Alice", amount: 25 },
+  { id: 2, customer: "Bob", amount: 40 },
+  { id: 3, customer: "Alice", amount: 35 },
+  { id: 4, customer: "Charlie", amount: 20 },
+  { id: 5, customer: "Bob", amount: 60 },
+  { id: 6, customer: "Alice", amount: 40 },
+];
+
+const customerGrouping = transactions.reduce((acc, transaction) => {
+  const customerName = transaction.customer;
+  const savedValues = acc.get(customerName);
+
+  if (!savedValues) {
+    acc.set(customerName, {customer: transaction.customer, totalAmount: transaction.amount, totalTransactions: 1, averageAmount: transaction.amount});
+  } else {
+    savedValues.totalAmount += transaction.amount;
+    savedValues.totalTransactions ++;
+    savedValues.averageAmount = + /* or parseFloat */(savedValues.totalAmount / savedValues.totalTransactions).toFixed(2);
+  }
+  return acc;
+}, new Map());
+console.log(customerGrouping.values());  // This is meant to show you how .values() works in this case.
+// One of the better ways to do this when you have an array, is to map over the array and condition the logic to return the data.
+// This is where Destructuring becomes important. As an example, look at the operation below.
+
+const finalCustomerGrouping = [...customerGrouping].filter(([_, data]) => {
+  return data.totalTransactions >= 3;
+});
+console.log(finalCustomerGrouping.map(([_, data]) => {
+  return data;
+}).sort((a, b) => b.averageAmount - a.averageAmount)); 
+})();
+
+(() => {
+  console.log(`I'm here`);
+  const orders = [
+  { id: 1, customer: "Alice", product: "Book", amount: 30 },
+  { id: 2, customer: "Bob", product: "Pen", amount: 5 },
+  { id: 3, customer: "Alice", product: "Pen", amount: 10 },
+  { id: 4, customer: "Alice", product: "Notebook", amount: 25 },
+  { id: 5, customer: "Bob", product: "Book", amount: 15 },
+  { id: 6, customer: "Charlie", product: "Notebook", amount: 20 },
+  { id: 7, customer: "Alice", product: "Pen", amount: 5 },
+  { id: 8, customer: "Bob", product: "Notebook", amount: 10 },
+  { id: 9, customer: "Alice", product: "Book", amount: 20 },
+];
+
+const orderGrouping = orders.reduce((acc, order) => {
+  const customerName = order.customer;
+  const savedOrders = acc.get(customerName);
+
+  if (!savedOrders) {
+    acc.set(customerName, {customer: order.customer, totalAmount: order.amount, totalOrders: 1, productFrequency: {[order.product]: 1}});
+  } else {
+    savedOrders.totalAmount += order.amount;
+    savedOrders.totalOrders ++;
+    savedOrders.productFrequency[order.product] = (savedOrders.productFrequency[order.product] || 0) + 1;
+  }
+  return acc;
+}, new Map())
+// It is at this point i'd like you to consider a few things. At this point it should be clear what reduce does.
+// You'll notice that it can with objects as well as numbers, but for now let's focus on the different objects.
+// Reduce works with whatever object you want to accumulate your data to; it could be an array, an Object or as with the above
+// examples, a Map. This is where your data is reduced to. What this means is that this data can actually be manipulated after reduction.
+// You should not necessarily limit your thoughts to other methods for example, but you can introduce new properties in these objects.
+// This is the idea of mutation, at least fundamentally.
+// The idea of mutation comes from considering how Objects work; they are reference types and if this seems confusing, you should consider the opposite...
+// i.e copy-by-value. The way this works is that where you have two variables, a copy-by-value literally creates a new copy of an 
+// initial value that was passed to the new variable as a variable. So say you store a number 10 to the variable a...
+// let a = 10;
+// If you create a new variable b to store the variable a i.e let b = a; and change b i.e b = 20; b will log 20 while a will log 10.
+//With reference types, it's a bit different. Here, if we were to change b following the above example, a will also be changed. 
+// This will mostly happen with Objects, so...
+// let a = {name: `john`};
+// let b = a;
+// b.name = `jack`;
+// console.log(a)...{name: `jack`};
+// This aspect makes objects reference types and the change is mutation because you've changed a new variable that was referencing the original variable.
+// From the ongoing, it means that orderGrouping can be affected outside the reduce method.
+
+for (const [customer, data] of orderGrouping) { // This is the most important loop in this operation, because as you'll see
+  // It is the loop that causes a mutation to occur. This upper loop is also affected by another loop.
+  let maxCount = 0;  // The variable can be anything, but we use maxCount because it is in line to what we are trying to achieve.
+  let mostFrequent = null;
+  for(const [product, count] of Object.entries(data.productFrequency)) {
+    if (count > maxCount) {
+      maxCount = count;
+      mostFrequent = product;
+    }
+  }
+  data.mostFrequentProduct = mostFrequent;
+}  // It is important to consider that null is the best data type to use here because of what it communicates.
+// 0 would be used especially with numbers and an empty string would 
+console.log(orderGrouping.values());
+
+const finalOrderGrouping = [...orderGrouping].filter(([_, data]) => {
+  return data.totalOrders >= 3;
+});
+console.log(finalOrderGrouping.map(([_, data]) => data).sort((a, b) => b.totalAmount - a.totalAmount));
 })();
