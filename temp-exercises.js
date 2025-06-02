@@ -22,7 +22,7 @@ console.log(Object.prototype);
 console.log(`author` in book);
 })();
 
-(() => { // Exercise 1
+(() => { 
     const movie = {
         title: "Inception",
         director: {
@@ -40,7 +40,7 @@ console.log(`author` in book);
       console.log(movie.director?.films[1]);
 })();
 
-(() => { // Exercise 2
+(() => { 
     const movie = {
         title: "Inception",
         director: {
@@ -60,7 +60,7 @@ console.log(`author` in book);
       console.log(movie);    
 })();
 
-(() => { // Exercise 3
+(() => { 
     const classroom = {
         className: "Physics",
         students: [
@@ -116,7 +116,7 @@ console.log(`author` in book);
       console.log(classroom[`students`][2][`scores`][`exam3`]);
 })();
 
-(() => { // Exercise 4
+(() => { 
     // It is important to consider what is happening here.
     // We are dealing with a situation where we have an object that has nested objects.
     // Notice that the object and the function are very different entities.
@@ -148,7 +148,7 @@ console.log(`author` in book);
       
 })();
 
-(() => { // Exercise 5
+(() => { 
     const employee = {
         name: "Eve",
         department: "Engineering",
@@ -270,8 +270,6 @@ multiplyNumeric(menu);
     { name: "Emma", grade: 59 },
     { name: "Ava", grade: 48 }
   ];
-  
-  // Use .filter() to return students who passed (grade >= 60)
 
   const passedGrade = students.filter((student) => {
     return student[`grade`] >= 60;
@@ -288,8 +286,6 @@ multiplyNumeric(menu);
     { name: "Emma", grade: 59 },
     { name: "Ava", grade: 48 }
   ];
-  
-  // Your task: filter students with grade < 60
 
   const lessThan60 = students.filter((student) => {
     return student[`grade`] < 60;
@@ -1475,7 +1471,6 @@ console.log(finalCustomerGrouping.map(([_, data]) => {
 })();
 
 (() => {
-  console.log(`I'm here`);
   const orders = [
   { id: 1, customer: "Alice", product: "Book", amount: 30 },
   { id: 2, customer: "Bob", product: "Pen", amount: 5 },
@@ -1540,4 +1535,197 @@ const finalOrderGrouping = [...orderGrouping].filter(([_, data]) => {
   return data.totalOrders >= 3;
 });
 console.log(finalOrderGrouping.map(([_, data]) => data).sort((a, b) => b.totalAmount - a.totalAmount));
+})();
+
+(() => {
+  const purchases = [
+  { id: 1, customer: "Alice", category: "Books", amount: 25 },
+  { id: 2, customer: "Bob", category: "Electronics", amount: 100 },
+  { id: 3, customer: "Alice", category: "Books", amount: 40 },
+  { id: 4, customer: "Charlie", category: "Electronics", amount: 200 },
+  { id: 5, customer: "Alice", category: "Groceries", amount: 15 },
+  { id: 6, customer: "Bob", category: "Books", amount: 30 },
+  { id: 7, customer: "Charlie", category: "Groceries", amount: 50 },
+  { id: 8, customer: "Alice", category: "Electronics", amount: 60 },
+  { id: 9, customer: "Charlie", category: "Books", amount: 20 },
+  { id: 10, customer: "Bob", category: "Electronics", amount: 150 },
+];
+
+const customerGrouping = purchases.reduce((acc, purchase) => {
+  const customerName = purchase.customer;
+  const categoryName = purchase.category;
+  const savedPurchases = acc.get(customerName);
+
+  if (!savedPurchases) {
+    acc.set(customerName, {
+      customer: purchase.customer, 
+      totalAmount: purchase.amount, 
+      totalSpendPerCategory: {[categoryName]: purchase.amount}, 
+      categoryFrequency: {[purchase.category]: 1}
+    });
+  } else {
+    savedPurchases.totalAmount += purchase.amount;
+    savedPurchases.totalSpendPerCategory[categoryName]= (savedPurchases.totalSpendPerCategory[categoryName] || 0) + purchase.amount;
+    savedPurchases.categoryFrequency[purchase.category] = (savedPurchases.categoryFrequency[purchase.category] || 0) + 1;
+  }
+  return acc;
+}, new Map());
+
+for(const [_, data] of customerGrouping) {
+  let maxAmount = 0;
+  let topCategory = null;
+  for (const [category, amount] of Object.entries(data.totalSpendPerCategory)) {
+    if (amount > maxAmount) {
+      maxAmount = amount;
+      topCategory = category; 
+    }
+  }
+  data.mostSpentCategory = topCategory;
+}
+
+console.log([...customerGrouping.values()].sort((a, b) => b.totalAmount - a.totalAmount));
+})();
+
+(() => {
+  const purchases = [
+  { id: 1, customer: "Alice", category: "Books", product: "Fiction", amount: 25 },
+  { id: 2, customer: "Bob", category: "Electronics", product: "Phone", amount: 100 },
+  { id: 3, customer: "Alice", category: "Books", product: "Non-Fiction", amount: 40 },
+  { id: 4, customer: "Alice", category: "Books", product: "Fiction", amount: 30 },
+  { id: 5, customer: "Charlie", category: "Groceries", product: "Fruits", amount: 50 },
+  { id: 6, customer: "Bob", category: "Electronics", product: "Headphones", amount: 60 },
+  { id: 7, customer: "Alice", category: "Electronics", product: "Phone", amount: 200 },
+  { id: 8, customer: "Charlie", category: "Books", product: "Fiction", amount: 20 },
+  { id: 9, customer: "Charlie", category: "Groceries", product: "Vegetables", amount: 35 },
+  { id: 10, customer: "Bob", category: "Books", product: "Comics", amount: 15 },
+];
+
+const customerGrouping = purchases.reduce((acc, purchase) => {
+  const customerName = purchase.customer;
+  const categoryName = purchase.category;
+  const savedPurchases = acc.get(customerName);
+
+  if (!savedPurchases) {
+    acc.set(customerName, {customer: purchase.customer, categories: {[categoryName]: {totalAmount: purchase.amount, productFrequency: {[purchase.product]: 1}}}});
+  } else {
+    if (!savedPurchases.categories[categoryName]) {
+      savedPurchases.categories[categoryName] = {totalAmount: purchase.amount, productFrequency: {[purchase.product]: 1}};
+    } else {
+      savedPurchases.categories[categoryName].totalAmount += purchase.amount;
+      savedPurchases.categories[categoryName].productFrequency[purchase.product] = (savedPurchases.categories[categoryName].productFrequency[purchase.product] || 0) + 1;
+    }
+  }
+  return acc;
+}, new Map ());
+
+for (const [_, data] of customerGrouping) {
+  for (const categoryName of Object.keys(data.categories)) {
+    let maxCount = 0;
+    let mostFrequentProduct = null;
+    for (const [product, count] of Object.entries(data.categories[categoryName].productFrequency)) {
+      if (count > maxCount) {
+        maxCount = count;
+        mostFrequentProduct = product;
+      }
+    }
+      data.categories[categoryName].mostFrequentProduct = mostFrequentProduct;
+  }
+}
+console.log(customerGrouping.values());
+})();
+
+(() => {
+  const orders = [
+  { customer: "Alice", deliveryCity: "Nairobi", product: "Book", price: 20 },
+  { customer: "Bob", deliveryCity: "Mombasa", product: "Phone", price: 150 },
+  { customer: "Alice", deliveryCity: "Nairobi", product: "Pen", price: 5 },
+  { customer: "Alice", deliveryCity: "Kisumu", product: "Book", price: 25 },
+  { customer: "Bob", deliveryCity: "Mombasa", product: "Laptop", price: 500 },
+  { customer: "Alice", deliveryCity: "Nairobi", product: "Book", price: 20 },
+];
+
+const customerGrouping = orders.reduce((acc, order) => {
+  const customerName = order.customer;
+  const cityName = order.deliveryCity;
+  const savedOrders = acc.get(customerName);
+
+  if (!savedOrders) {
+    acc.set(customerName, {
+        [cityName]: {
+          totalAmount: order.price, 
+          productFrequency: {
+            [order.product]: 1}
+          }
+      });
+  } else if (!savedOrders[cityName]) {
+    savedOrders[cityName] = {
+      totalAmount: order.price, 
+      productFrequency: {
+        [order.product]: 1
+      }
+    };
+  } else {
+    savedOrders[cityName].totalAmount += order.price;
+    savedOrders[cityName].productFrequency[order.product] = (
+      savedOrders[cityName].productFrequency[order.product] || 0
+    ) + 1;
+  }
+  return acc;
+}, new Map());
+console.log(customerGrouping.values());
+})();
+
+(() => {
+  console.log(`I'm here`);
+  const orders = [
+  { id: 1, customer: "Alice", country: "Kenya", category: "Books", product: "Fiction", amount: 25 },
+  { id: 2, customer: "Bob", country: "Uganda", category: "Electronics", product: "Phone", amount: 200 },
+  { id: 3, customer: "Alice", country: "Kenya", category: "Books", product: "Non-Fiction", amount: 30 },
+  { id: 4, customer: "Alice", country: "Kenya", category: "Electronics", product: "Laptop", amount: 500 },
+  { id: 5, customer: "Charlie", country: "Tanzania", category: "Groceries", product: "Vegetables", amount: 40 },
+  { id: 6, customer: "Bob", country: "Uganda", category: "Electronics", product: "Phone", amount: 250 },
+  { id: 7, customer: "Alice", country: "Kenya", category: "Books", product: "Fiction", amount: 20 },
+  { id: 8, customer: "Charlie", country: "Tanzania", category: "Groceries", product: "Fruits", amount: 35 },
+  { id: 9, customer: "Bob", country: "Uganda", category: "Books", product: "Comics", amount: 15 },
+  { id: 10, customer: "Charlie", country: "Tanzania", category: "Electronics", product: "Headphones", amount: 120 },
+];
+
+const countryGrouping = orders.reduce((acc, order) => {
+  const countryName = order.country;
+  const customerName = order.customer;
+  const categoryName = order.category;
+  const savedOrders = acc.get(countryName);
+
+  if (!savedOrders) {
+    acc.set(countryName, {[countryName]: {[customerName]: {[categoryName]: {totalAmount: order.amount, productPurchaseFrequency: {[order.product]: 1}}}}});
+  } else if (!savedOrders[countryName]) {
+    savedOrders[countryName] = {[customerName]: {[categoryName]: {totalAmount: order.amount, productPurchaseFrequency: {[order.product]: 1}}}};
+  }else if (!savedOrders[countryName][customerName]) {
+    savedOrders[countryName][customerName] = {[categoryName]: {totalAmount: order.amount, productPurchaseFrequency: {[order.product]: 1}}};
+  }else if (!savedOrders[countryName][customerName][categoryName]) {
+    savedOrders[countryName][customerName][categoryName] = {totalAmount: order.amount, productPurchaseFrequency: {[order.product]: 1}};
+  } else {
+    savedOrders[countryName][customerName][categoryName].totalAmount += order.amount;
+    savedOrders[countryName][customerName][categoryName].productPurchaseFrequency[order.product] = (savedOrders[countryName][customerName][categoryName].productPurchaseFrequency[order.product] || 0) + 1;
+  }
+  return acc;
+}, new Map());
+
+for (const [countryName, data] of countryGrouping) {
+  for (const customerName of Object.keys(data[countryName])) {
+    for (const categoryName of Object.keys(data[customerName])) {
+      let maxCount = 0;
+      let mostFrequentlyPurchasedProduct = null;
+      for (const [product, count] of Object.entries(data[categoryName])) {
+        if (count > maxCount) {
+          maxCount = count;
+          mostFrequentlyPurchasedProduct = product;
+        }
+      }
+    }
+    data[customerName][categoryName].topProduct = mostFrequentlyPurchasedProduct;
+  }
+}
+
+console.log(countryGrouping.values());
 })();

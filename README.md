@@ -1,1 +1,3 @@
-# object-exercises
+# Object-exercises
+This repository contains my learning process with regard to Objects. As you'll notice, I begin by first understanding the fundamental operations involved with objects and as the exercises continue, I introduce new concepts involving arrays and Maps and their methods.
+The Objecive here is to record my learning process for future references and possibly for inspiration. The repository is constantly updated and it is strictly an operation based repository.
