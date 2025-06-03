@@ -1676,7 +1676,6 @@ console.log(customerGrouping.values());
 })();
 
 (() => {
-  console.log(`I'm here`);
   const orders = [
   { id: 1, customer: "Alice", country: "Kenya", category: "Books", product: "Fiction", amount: 25 },
   { id: 2, customer: "Bob", country: "Uganda", category: "Electronics", product: "Phone", amount: 200 },
@@ -1711,21 +1710,88 @@ const countryGrouping = orders.reduce((acc, order) => {
   return acc;
 }, new Map());
 
-for (const [countryName, data] of countryGrouping) {
-  for (const customerName of Object.keys(data[countryName])) {
-    for (const categoryName of Object.keys(data[customerName])) {
+for (const [_, data] of countryGrouping) {
+  for (const countryName of Object.keys(data)) {
+    for (const customerName of Object.keys(data[countryName])) {
+    for (const categoryName of Object.keys(data[countryName][customerName])) {
       let maxCount = 0;
       let mostFrequentlyPurchasedProduct = null;
-      for (const [product, count] of Object.entries(data[categoryName])) {
+      for (const [product, count] of Object.entries(data[countryName][customerName][categoryName].productPurchaseFrequency)) {
         if (count > maxCount) {
           maxCount = count;
           mostFrequentlyPurchasedProduct = product;
         }
       }
+      data[countryName][customerName][categoryName].topProduct = mostFrequentlyPurchasedProduct;
     }
-    data[customerName][categoryName].topProduct = mostFrequentlyPurchasedProduct;
   }
+}
 }
 
 console.log(countryGrouping.values());
+})();
+
+(() => {
+  console.log(`I'm here`);
+  const orders = [
+  { customer: "Alice", continent: "Africa", country: "Kenya", product: "Book", amount: 25 },
+  { customer: "Bob", continent: "Africa", country: "Nigeria", product: "Phone", amount: 300 },
+  { customer: "Alice", continent: "Africa", country: "Kenya", product: "Pen", amount: 5 },
+  { customer: "Alice", continent: "Africa", country: "Kenya", product: "Book", amount: 30 },
+  { customer: "Charlie", continent: "Asia", country: "India", product: "Phone", amount: 250 },
+  { customer: "Bob", continent: "Africa", country: "Nigeria", product: "Laptop", amount: 500 },
+  { customer: "Charlie", continent: "Asia", country: "India", product: "Charger", amount: 50 },
+  { customer: "Alice", continent: "Africa", country: "Kenya", product: "Book", amount: 20 },
+];
+
+const continentalGrouping = orders.reduce((acc, order) => {
+  const continentName = order.continent;
+  const countryName = order.country;
+  const customerName = order.customer;
+  const productName = order.product;
+  const savedOrders = acc.get(continentName);
+
+  if (!savedOrders) {
+    acc.set(continentName, {
+      [continentName]: {
+        [countryName]: {
+          [customerName]: {
+            totalAmount: order.amount, 
+            productFrequency: {[productName]: 1
+            }
+          }
+        }
+      }
+    });
+  } else if (!savedOrders[continentName]) {
+    savedOrders[continentName] = {[countryName]: {[customerName]: {totalAmount: order.amount, productFrequency: {[productName]: 1}}}};
+  } else if (!savedOrders[continentName][countryName]) {
+    savedOrders[continentName][countryName] = {[customerName]: {totalAmount: order.amount, productFrequency: {[productName]: 1}}};
+  } else if (!savedOrders[continentName][countryName][customerName]) {
+    savedOrders[continentName][countryName][customerName] = {totalAmount: order.amount, productFrequency: {[productName]: 1}};
+  }else {
+    savedOrders[continentName][countryName][customerName].totalAmount += order.amount;
+    savedOrders[continentName][countryName][customerName].productFrequency[productName] = ( savedOrders[continentName][countryName][customerName].productFrequency[productName] || 0) + 1;
+  }
+  return acc;
+}, new Map());
+
+for (const [_, data] of continentalGrouping) {
+  for (const continentName of Object.keys(data)) {
+    for (const countryName of Object.keys(data[continentName])) {
+      for (const customerName of Object.keys(data[continentName][countryName])) {
+        let maxCount = 0;
+        let topProduct = null;
+        for (const [product, count] of Object.entries(data[continentName][countryName][customerName].productFrequency)) {
+          if (count > maxCount) {
+            maxCount = count;
+            topProduct = product;
+          }
+        }
+        data[continentName][countryName][customerName].topProduct = topProduct;
+      }
+    }
+  }
+}
+console.log(continentalGrouping.values());
 })();
