@@ -1507,7 +1507,7 @@ const orderGrouping = orders.reduce((acc, order) => {
 // initial value that was passed to the new variable as a variable. So say you store a number 10 to the variable a...
 // let a = 10;
 // If you create a new variable b to store the variable a i.e let b = a; and change b i.e b = 20; b will log 20 while a will log 10.
-//With reference types, it's a bit different. Here, if we were to change b following the above example, a will also be changed. 
+// With reference types, it's a bit different. Here, if we were to change b following the above example, a will also be changed. 
 // This will mostly happen with Objects, so...
 // let a = {name: `john`};
 // let b = a;
@@ -1732,7 +1732,6 @@ console.log(countryGrouping.values());
 })();
 
 (() => {
-  console.log(`I'm here`);
   const orders = [
   { customer: "Alice", continent: "Africa", country: "Kenya", product: "Book", amount: 25 },
   { customer: "Bob", continent: "Africa", country: "Nigeria", product: "Phone", amount: 300 },
@@ -1764,14 +1763,32 @@ const continentalGrouping = orders.reduce((acc, order) => {
       }
     });
   } else if (!savedOrders[continentName]) {
-    savedOrders[continentName] = {[countryName]: {[customerName]: {totalAmount: order.amount, productFrequency: {[productName]: 1}}}};
+    savedOrders[continentName] = {
+      [countryName]: {
+        [customerName]: {
+          totalAmount: order.amount, 
+          productFrequency: {
+            [productName]: 1
+          }
+        }
+      }
+    };
   } else if (!savedOrders[continentName][countryName]) {
-    savedOrders[continentName][countryName] = {[customerName]: {totalAmount: order.amount, productFrequency: {[productName]: 1}}};
+    savedOrders[continentName][countryName] = {
+      [customerName]: {
+        totalAmount: order.amount, 
+        productFrequency: {
+          [productName]: 1
+        }
+      }
+    };
   } else if (!savedOrders[continentName][countryName][customerName]) {
     savedOrders[continentName][countryName][customerName] = {totalAmount: order.amount, productFrequency: {[productName]: 1}};
   }else {
     savedOrders[continentName][countryName][customerName].totalAmount += order.amount;
-    savedOrders[continentName][countryName][customerName].productFrequency[productName] = ( savedOrders[continentName][countryName][customerName].productFrequency[productName] || 0) + 1;
+    savedOrders[continentName][countryName][customerName].productFrequency[productName] = (
+      savedOrders[continentName][countryName][customerName].productFrequency[productName] || 0
+    ) + 1;
   }
   return acc;
 }, new Map());
@@ -1794,4 +1811,313 @@ for (const [_, data] of continentalGrouping) {
   }
 }
 console.log(continentalGrouping.values());
+})();
+
+// USING OBJECTS INSIDE ARRAYS AND VICE VERSA
+// It is important that you understand that object mutations can create bugs in the code and that is why it is important to try
+// change a property in your object, without mutating the object. Some of the following exercises below look into how that can be 
+// achieved while introducing some new array methods like .find() and .findIndex().
+(() => {
+  const students = [
+  { name: "Alice", courses: ["Math", "History", "Biology"] },
+  { name: "Bob", courses: ["Math", "Physics"] },
+  { name: "Charlie", courses: ["History", "Math", "Physics", "Biology"] },
+];
+const courseGrouping = {}; 
+
+students.forEach((student) => {
+  student.courses.forEach((course) => {
+    !courseGrouping[course] ? courseGrouping[course] = [student.name]: courseGrouping[course].push(student.name);
+  });
+});
+console.log(courseGrouping);
+})();
+
+(() => {
+  const employees = [
+  { name: "Alice", department: "Sales" },
+  { name: "Bob", department: "Engineering" },
+  { name: "Charlie", department: "Sales" },
+  { name: "David", department: "Engineering" },
+  { name: "Eve", department: "HR" }
+];
+
+const departmentGrouping = employees.reduce((acc, employee) => {
+  departmentName = employee.department;
+
+  acc[departmentName] = acc[departmentName] || [];
+  !acc[departmentName].includes(employee.name) ? acc[departmentName].push(employee.name): [];
+  return acc;
+}, {});
+console.log(departmentGrouping);
+})();
+
+(() => {
+  const employees = [
+  { name: "Alice", department: "Sales", role: "Manager" },
+  { name: "Bob", department: "Engineering", role: "Developer" },
+  { name: "Charlie", department: "Sales", role: "Executive" },
+  { name: "David", department: "Engineering", role: "Developer" },
+  { name: "Eve", department: "HR", role: "Manager" },
+  { name: "Frank", department: "Engineering", role: "Manager" },
+];
+
+const departmentGrouping = employees.reduce((acc, employee) => {
+  const departmentName = employee.department;
+  const roleName = employee.role;
+  const employeeName = employee.name;
+
+  acc[departmentName] = acc[departmentName] || {};
+  if (!acc[departmentName][roleName]) {
+    acc[departmentName][roleName] = [employeeName];
+  } else {
+    acc[departmentName][roleName].push(employeeName);
+  }
+  return acc;
+}, {});
+console.log(departmentGrouping);
+})();
+
+(() => {
+  const books = [
+  { id: 101, title: "1984", isAvailable: true },
+  { id: 102, title: "Brave New World", isAvailable: true },
+  { id: 103, title: "Fahrenheit 451", isAvailable: true }
+];
+
+const book = books.find((object) => {  // .find() is an array method that iterates through the items in a list and `captures` an 
+  // item based on the condition we write for it. Here we have an array of objects and that means all the tendencies associated with
+  // such data should be followed i.e how to access data in a nest etc.
+  return object.title === `Fahrenheit 451`;
+});
+if (book) {
+  book.isAvailable = false;  // After finding(capturing) the item we want to manipulate, because a reference to that item is stored
+  // in a variable as shown, that item can be affected in any way we would like.
+}
+console.log(books);
+})();
+
+(() => {
+  const products = [
+  { id: 1, name: "Laptop", stock: 12 },
+  { id: 2, name: "Phone", stock: 0 },
+  { id: 3, name: "Tablet", stock: 5 }
+];
+
+const foundProduct = products.find((product) => {
+  return product.id === 2;
+});
+if (foundProduct) foundProduct.stock = 10;  // Notice that it's not the original array that is affected. We use the referenced item
+// to change the properties and that will affect the original array because changing a reference changes the original array.
+console.log(products);
+})();
+
+(() => {  // Here, both operations return the same output. It is also worth considering how map is utilised.
+  const products = [
+  { id: 1, name: "Laptop", stock: 12 },
+  { id: 2, name: "Phone", stock: 0 },
+  { id: 3, name: "Tablet", stock: 0 }
+];
+
+products.forEach((product) => {
+  if (product.stock === 0) product.stock = 15;
+});
+console.log(products);
+
+const foundProduct = products.map((product) => {
+  return (product.stock === 0 ? {...product, stock: 15} : product);  // The spread operator in this case is used when you want
+  // to keep the original array unchanged i.e immutable and what it's doing is that we are basically collecting all the properties
+  // that come before the property we want to affect.
+});
+console.log(foundProduct);
+})();
+
+(() => {
+  const inventory = [
+  { id: 1, item: "Book", quantity: 10 },
+  { id: 2, item: "Pen", quantity: 20 }
+];
+
+console.log(inventory);
+const newInventory = [...inventory, {id: 3, item: `Notebook`, quantity: 15}];  // This is the best way to add a new item in an 
+// array and still keep the original array unaltered.
+
+console.log(newInventory);
+})();
+
+(() => {
+  const users = [
+  { id: 1, name: "Alice" },
+  { id: 2, name: "Bob" }
+];
+const newUser = { id: 3, name: "Charlie" };
+
+const idExists = users.some((user) => {
+  return user.id === 3;
+});
+if (!idExists) {
+  const newUsers = [...users, newUser];
+  console.log(newUsers);
+} else {
+  console.log(users);
+}
+})();
+
+(() => {
+  const users = [
+  { id: 1, name: "Alice" },
+  { id: 2, name: "Bob" }
+];
+
+const newUser = { id: 2, name: "Bobby" }; // should replace Bob
+
+// If a user with the same id exists, replace the existing user with the new one.
+// If no such user exists, add the new user to the end of the array.
+
+const sameIdExists = users.some((user) => {
+  return user.id === 2;
+});
+
+if (sameIdExists) {
+  const foundUser = users.find((user) => {  // From this exercise, you learn that the find method can be a very powerful tool
+    // where mutation is required. This is because find(), finds the item with the condition created and stores a reference for it.
+    // You can then create logic that affects the original item, in this case, mutation of an object.
+    return user.id === 2;
+  });
+  foundUser.name = `Bobby`;
+  console.log(users);
+} else {
+  const newUsers = [...users, newUser];
+  console.log(newUsers);
+}
+})();
+
+// INTRODUCE findIndex()
+(() => {
+  const products = [
+  { id: 1, name: "Laptop", price: 1000 },
+  { id: 2, name: "Phone", price: 500 }
+];
+
+const incomingProduct = { id: 2, name: "Phone", price: 550 }; // should update
+
+// If a product with the same id already exists, update its price.
+// If it doesn’t exist, add it to the array.
+
+const elementIndex = products.findIndex((product) => {  // With the method findIndex(), you need to consider the following;
+  // Just like most of the array methods we've looked at, there will be a condition attached to it. findIndex looks at the condition
+  // given to it and returns the INDEX of the first element that matches the condition that is fed into it.
+  return product.id === incomingProduct.id;  // In this case, findIndex will look at this condition and see that it's being asked to
+  // compare the ids of each of the old products and the incoming products. If there is a match, it returns the index of the
+  // first product that the condition meets. In this case, that would be index 1 of the second product(object). So elementIndex stores
+  // 1. If it does not find any product that meets the condition, it returns -1, thus making the condition below important.
+});
+if (elementIndex !== -1) {
+  const updatedProducts = [...products];  // This clones the original array to avoid mutating it, which is usually prefered.
+  updatedProducts[elementIndex] = incomingProduct;  //Remember, if we wanted to update an item inside an array, we use it's index.
+  // This is what this operation doesm but it's doing so dynamically.
+  console.log(updatedProducts);
+} else {
+  const newProducts = [...products, incomingProduct];  // It is worth considering how you name the variables based on the operation
+  // that's taking place. Here we are adding and not updating/mutating an array.
+  console.log(newProducts);
+}
+})();
+
+(() => {
+  const inventory = [
+  { id: 1, item: "Book", quantity: 4 },
+  { id: 2, item: "Pen", quantity: 10 }
+];
+
+const incomingStock = { id: 2, item: "Pen", quantity: 5 };  // quantity is what's new
+
+// If the item already exists in the inventory (based on id): Increase its quantity by the incomingStock.quantity.
+// If it doesn't exist, add it to the inventory as a new item.
+
+const elementIndex = inventory.findIndex((data) => {
+  return data.id === incomingStock.id;
+});
+if (elementIndex !== -1) {
+  const updatedInventory = [...inventory];
+  updatedInventory[elementIndex] = {...updatedInventory[elementIndex], quantity: 
+    updatedInventory[elementIndex].quantity + incomingStock.quantity};
+  console.log(updatedInventory);
+} else {
+  const newInventory = [...inventory, incomingStock];
+  console.log(newInventory);
+}
+})();
+
+(() => {
+  const products = [
+  { id: 1, name: "Laptop", price: 1000, history: [1000] },
+  { id: 2, name: "Phone", price: 500, history: [450, 470, 500] }
+];
+
+const incoming = { id: 2, name: "Phone", price: 520 };
+
+// If the product exists:
+  // - Update the price
+  // - Push the new price to its `history` array
+
+// If it doesn’t exist:
+  // - Add it as a new product
+  // - Start `history` as [price]
+
+  const elementIndex = products.findIndex((product) => {
+    return product.name === incoming.name;
+  });
+
+  if (elementIndex !== -1) {
+    const updatedProducts = [...products];
+    updatedProducts[elementIndex] = {...updatedProducts[elementIndex], 
+      price: incoming.price, 
+      history: [...updatedProducts[elementIndex].history, incoming.price]};
+    console.log(updatedProducts);
+  } else {
+    const newProducts = [...products, {...incoming, history: [incoming.price]}];
+    console.log(newProducts);
+  }
+})();
+
+(() => {
+  console.log(`I'm here`);
+  const products = [
+  {
+    id: 1,
+    name: "Laptop",
+    specs: {
+      weight: "1.2kg",
+      battery: "10hrs"
+    }
+  },
+  {
+    id: 2,
+    name: "Phone",
+    specs: {
+      weight: "200g",
+      battery: "24hrs"
+    }
+  }
+];
+
+const update = {
+  id: 2,
+  specs: {
+    battery: "30hrs"
+  }
+};
+// Update the product with id: 2 so that only its specs.battery is changed to "30hrs", without mutating the original products array.
+
+const elementIndex = products.findIndex((product) => {
+  return product.id === update.id;
+});
+if (elementIndex !== -1) {
+  const updatedProducts = [...products];
+  updatedProducts[elementIndex] = {...updatedProducts[elementIndex], 
+    specs: {...updatedProducts[elementIndex].specs, 
+      battery: update.specs.battery}};
+  console.log(updatedProducts);
+}
 })();
