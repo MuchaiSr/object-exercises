@@ -2082,7 +2082,6 @@ const incoming = { id: 2, name: "Phone", price: 520 };
 })();
 
 (() => {
-  console.log(`I'm here`);
   const products = [
   {
     id: 1,
@@ -2120,4 +2119,344 @@ if (elementIndex !== -1) {
       battery: update.specs.battery}};
   console.log(updatedProducts);
 }
+})();
+
+(() => {
+  const products = [
+  {
+    id: 1,
+    name: "Laptop",
+    specs: {
+      battery: "8hrs"
+    }
+  },
+  {
+    id: 2,
+    name: "Phone",
+    specs: {
+      battery: "24hrs"
+    }
+  }
+];
+
+const update = {
+  id: 2,
+  specs: {
+    battery: "30hrs" // Only apply if this is longer
+  }
+};
+
+// Update only if the incoming battery life is longer (i.e., "30hrs" > "24hrs"). 
+// Assume the time is always written as a number followed by "hrs".
+
+const elementIndex = products.findIndex((product) => {
+  return (parseFloat(update.specs.battery) > parseFloat(product.specs.battery)) && (product.id === update.id);
+});
+
+if (elementIndex !==-1) {
+  const updatedProducts = [...products];
+  updatedProducts[elementIndex] = {...updatedProducts[elementIndex], 
+    specs: {...updatedProducts[elementIndex].specs, 
+      battery: update.specs.battery}
+    };
+    console.log(updatedProducts);
+}
+})();
+
+(() => {
+  const catalog = [
+  {
+    id: 1,
+    title: "JavaScript Basics",
+    lessons: [
+      { id: "a", title: "Variables", completed: true },
+      { id: "b", title: "Functions", completed: false }
+    ]
+  },
+  {
+    id: 2,
+    title: "Advanced JavaScript",
+    lessons: [
+      { id: "c", title: "Closures", completed: false },
+      { id: "d", title: "Async/Await", completed: false }
+    ]
+  }
+];
+
+const updates = [
+  { courseId: 2, lessonId: "d", completed: true },
+  { courseId: 1, lessonId: "b", completed: true }
+];
+
+// Do not mutate catalog.
+// Apply the updates from the updates array.
+// Return a new version of catalog where the specified lessons have their completed field updated to true.
+
+const copiedCatalog = structuredClone(catalog);
+
+const updatedCatalog = copiedCatalog.map((course) => {
+  // Check if there's any update for this course
+  const courseUpdates = updates.filter(u => {
+    return u.courseId === course.id;
+  });
+
+  // If there are no updates for this course, return as-is
+  if (courseUpdates.length === 0) return course;
+
+  // Otherwise, update the lessons
+  const updatedLessons = course.lessons.map(lesson => {
+    const matchingUpdate = courseUpdates.find((u) => {
+     return u.lessonId === lesson.id;
+    });
+    if (matchingUpdate) {
+      return { ...lesson, completed: matchingUpdate.completed };
+    }
+    return lesson;
+  });
+
+  // Return course with updated lessons
+  return { ...course, lessons: updatedLessons };
+});
+
+console.log(updatedCatalog);
+})();
+
+(() => {
+  const projects = [
+  {
+    id: 1,
+    title: "Portfolio Website",
+    tasks: [
+      { id: "a", title: "Design mockup", done: false },
+      { id: "b", title: "Code landing page", done: false }
+    ]
+  },
+  {
+    id: 2,
+    title: "Todo App",
+    tasks: [
+      { id: "c", title: "Set up project", done: true },
+      { id: "d", title: "Add localStorage", done: false }
+    ]
+  }
+];
+
+const updates = [
+  { projectId: 1, taskId: "b", done: true },
+  { projectId: 2, taskId: "d", done: true }
+];
+
+// Leaves projects unchanged
+// Returns a new version of the data with updates applied
+// Makes sure only the specified taskIds inside the right projectIds are updated
+
+const copiedProjects = structuredClone(projects);
+
+const updatedCopiedProjects = copiedProjects.map((object) => {
+  const updatedTasks = object.tasks.map((obj) => {
+    const matchedTasks = updates.find((project) => {
+      return obj.id === project.taskId;
+    });
+    if (matchedTasks) {
+      return {...obj, done: matchedTasks.done};
+    }
+    return obj;
+  });
+  return {...object, tasks: updatedTasks};
+});
+console.log(updatedCopiedProjects);
+})();
+
+(() => {
+  const students = [
+  {
+    id: 1,
+    name: "Alice",
+    subjects: [
+      { code: "ENG", grade: 75 },
+      { code: "MATH", grade: 88 }
+    ]
+  },
+  {
+    id: 2,
+    name: "Bob",
+    subjects: [
+      { code: "ENG", grade: 82 },
+      { code: "SCI", grade: 91 }
+    ]
+  }
+];
+
+const gradeUpdates = [
+  { studentId: 1, subjectCode: "ENG", grade: 80 },
+  { studentId: 2, subjectCode: "SCI", grade: 95 }
+];
+
+const copiedStudentsArray = structuredClone(students);
+
+const updatedCopiedStudentsArray = copiedStudentsArray.map((student) => {  // What this statement does is that it allows us to access
+  // the nested arrays.
+  const filteredGradeUpdates = gradeUpdates.filter((grade) => {
+    return grade.studentId === student.id;
+  });
+  const updatedSubjects = student.subjects.map((subj) => {  // With access to the deeper nest, we can now manipulate it in the ways
+    // we've been doing before, but what you learn from some of these exercises is to look for whatever element you want to change 
+    // or manipulate and then once you find it, you need to think of the route you'll take to get to it.
+    // It is important that you understand that there will be other operations you'll need to create and that is where array methods
+    // can be very handy.
+    const foundGradeUpdates = filteredGradeUpdates.find((grades) => {
+      return grades.subjectCode === subj.code;
+    });
+    if (foundGradeUpdates) {
+      return {...subj, grade: foundGradeUpdates.grade};
+    }
+    return subj;
+  });
+  return {...student, subjects: updatedSubjects};
+});
+console.log(updatedCopiedStudentsArray);
+})();
+
+(() => {
+  const students = [
+  {
+    id: 1,
+    name: "Alice",
+    subjects: [
+      { code: "ENG", grade: 75 },
+      { code: "MATH", grade: 88 }
+    ]
+  },
+  {
+    id: 2,
+    name: "Bob",
+    subjects: [
+      { code: "ENG", grade: 82 },
+      { code: "SCI", grade: 91 }
+    ]
+  }
+];
+
+const gradeUpdates = [
+  { studentId: 1, subjectCode: "ENG", grade: 80 },   // should update
+  { studentId: 2, subjectCode: "SCI", grade: 95 },   // should update
+  { studentId: 1, subjectCode: "HIST", grade: 70 },  // should be added
+  { studentId: 2, subjectCode: "MATH", grade: 89 }   // should be added
+];
+
+// Do not mutate students.
+// Apply updates using structuredClone().
+// For each gradeUpdate:
+//  If the subject exists for that student, update the grade.
+//  If it doesn’t exist, add the new subject with the given grade.
+
+const copiedStudentsArray = structuredClone(students);
+
+const updatedCopiedStudentsArray = copiedStudentsArray.map((student) => {
+  const filteredGradeUpdates = gradeUpdates.filter((grade) => {  // This statement filters the global array based on studentId.
+    // What that means is that the subjects/subject codes appear on the array based on a particular student. 
+    // So Alice will have ENG and HIST. Bob will have SCI and MATH.
+    // This is relevant because if I wanted to add a new subject that is not already existing after an update, I can use this array
+    // and not any other one.
+    return grade.studentId === student.id;
+  });
+  const updatedSubjects = student.subjects.map((subj) => {
+    const foundGradeUpdates = filteredGradeUpdates.find((grades) => {
+      return grades.subjectCode === subj.code;
+    });
+    if (foundGradeUpdates) {
+      return {...subj, grade: foundGradeUpdates.grade};
+    }
+    return subj;
+  });
+      filteredGradeUpdates.forEach((update) => {  // Again, remember that the filter was based on student Id and so each student
+        // should have at least 3 subjects.
+    const alreadyExists = updatedSubjects.some((subject) => {  // .some() checks whether at least one of the values after the update is
+      // complete meets the condition here. If it does not meet it, it will return false.
+      return subject.code === update.subjectCode
+    });
+    if (!alreadyExists) {
+      updatedSubjects.push({code: update.subjectCode, grade: update.grade});
+    }
+  });
+
+  return {...student, subjects: updatedSubjects};
+});
+console.log(updatedCopiedStudentsArray);
+})();
+
+(() => {
+  const boards = [
+  {
+    id: 1,
+    title: "Personal",
+    lists: [
+      {
+        id: "a",
+        name: "To Do",
+        cards: [
+          { id: "x", text: "Buy groceries", done: false }
+        ]
+      }
+    ]
+  },
+  {
+    id: 2,
+    title: "Work",
+    lists: [
+      {
+        id: "b",
+        name: "In Progress",
+        cards: [
+          { id: "y", text: "Prepare report", done: true }
+        ]
+      }
+    ]
+  }
+];
+
+const updates = [
+  { boardId: 1, listId: "a", cardId: "x", done: true }, // should update
+  { boardId: 2, listId: "b", cardId: "z", text: "Email client", done: false }, // should be added
+  { boardId: 1, listId: "a", cardId: "w", text: "Clean kitchen", done: false } // should be added
+];
+
+// Instructions:
+// - Do NOT mutate the original `boards` array.
+// - Use structuredClone().
+// - If a cardId is found inside the right board and list, update it.
+// - If not, add the new card to the correct list.
+
+const copiedBoardsArray = structuredClone(boards);
+
+const updatedCopiedBoardsArray = copiedBoardsArray.map((board) => {
+  const filterBasedOnBoardId = updates.filter((u) => {
+    return u.boardId === board.id;
+  });
+  const updatedListsArray = board.lists.map((list) => {
+    const filterBasedOnListId = updates.filter((u) => {
+      return u.listId === list.id;
+    });
+    const updatedCardsArray = list.cards.map((card) => {
+      const foundUpdates = filterBasedOnListId.find((u) => {
+        return u.cardId === card.id;
+      });
+      if (foundUpdates) {
+        return {...card, done: foundUpdates.done};
+      }
+      return card;
+    });
+    filterBasedOnListId.forEach((update) => {
+      const alreadyExists = updatedCardsArray.some((card) => {
+        return card.id === update.cardId;
+      });
+      if (!alreadyExists) {
+        updatedCardsArray.push({id: update.cardId, text: update.text, done: update.done});
+      }
+    });
+    return {...list, cards: updatedCardsArray};
+  });
+  return {...board, lists: updatedListsArray};
+});
+console.log(updatedCopiedBoardsArray);
 })();
