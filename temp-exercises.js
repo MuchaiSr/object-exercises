@@ -2460,3 +2460,187 @@ const updatedCopiedBoardsArray = copiedBoardsArray.map((board) => {
 });
 console.log(updatedCopiedBoardsArray);
 })();
+
+(() => {
+  const board = {
+  id: 1,
+  title: "Personal",
+  lists: [
+    {
+      id: "a",
+      name: "To Do",
+      cards: [
+        { id: "x", text: "Buy groceries", done: false },
+        { id: "z", text: "Call mom", done: true },
+        { id: "y", text: "Pay bills", done: false }
+      ]
+    },
+    {
+      id: "b",
+      name: "Work",
+      cards: [
+        { id: "k", text: "Prepare report", done: true },
+        { id: "m", text: "Fix bug", done: false }
+      ]
+    }
+  ]
+};
+
+// Group all cards from all lists by their done status
+// Don’t mutate anything
+// Use .flatMap() or .reduce() if you like
+// Focus on clarity
+// Do not hardcode — it should work even if cards or lists change
+
+const copiedBoardArray = [{...board}];
+const updatedCopiedBoardArray = copiedBoardArray.map((object) => {
+  const listsGrouping = object.lists.reduce((acc, list) => {
+    listsId = list.id;
+    listsName = list.name;
+    listsCards = list.cards;
+    
+    list.cards.forEach((card) => {
+      if (card.done) {
+        acc.done = acc.done || [];
+        acc.done.push(card);
+      } else {
+        acc.notDone =  acc.notDone || [];
+        acc.notDone.push(card);
+      }
+    });
+    return acc;
+  }, {});
+  return {...object, lists: listsGrouping};
+});
+console.log(updatedCopiedBoardArray);
+
+const groupedCards = board.lists.reduce(  // This is the preferred solution.
+  (acc, list) => {
+    list.cards.forEach((card) => {
+      if (card.done) {
+        acc.done.push(card);
+      } else {
+        acc.notDone.push(card);
+      }
+    });
+    return acc;
+  },
+  { done: [], notDone: [] }
+);
+
+console.log(groupedCards);
+})();
+
+(() => {
+  const board = {
+  id: 1,
+  title: "Personal",
+  lists: [
+    {
+      id: "a",
+      name: "To Do",
+      cards: [
+        { id: "x", text: "Buy groceries", done: false },
+        { id: "z", text: "Call mom", done: true }
+      ]
+    },
+    {
+      id: "b",
+      name: "Work",
+      cards: [
+        { id: "y", text: "Prepare report", done: false }
+      ]
+    }
+  ]
+};
+
+const cardsToRemove = ["z", "y"];
+
+// Write code that:
+//   Returns a new board object with those card IDs removed.
+//   Doesn’t mutate the original board object.
+//   Preserves the structure of board (same lists, same board id/title, etc.)
+//   Removes only the cards whose id matches one in cardsToRemove.
+
+// The solution...
+
+const newBoard = {...board, 
+  lists: board.lists.map((list) => {
+    return ({...list, 
+  cards: list.cards.filter((card) => {
+    return !cardsToRemove.includes(card.id);
+  })})
+  })};
+
+console.log(newBoard);
+})();
+
+(() => {
+  console.log(`I'm here`);
+  const project = {
+  id: 101,
+  name: "Launch Website",
+  milestones: [
+    {
+      id: "m1",
+      title: "Design",
+      tasks: [
+        { id: "t1", title: "Wireframes", completed: false },
+        { id: "t2", title: "Mockups", completed: false }
+      ]
+    },
+    {
+      id: "m2",
+      title: "Development",
+      tasks: [
+        { id: "t3", title: "Frontend", completed: false },
+        { id: "t4", title: "Backend", completed: false }
+      ]
+    }
+  ]
+};
+
+const taskUpdates = [
+  { milestoneId: "m1", taskId: "t2", completed: true },
+  { milestoneId: "m2", taskId: "t4", completed: true },
+  { milestoneId: "m1", taskId: "t5", title: "Prototype", completed: false }
+];
+
+// Your goal is to update the status of specific tasks based on a list of updates.
+// Do not mutate the original project object.
+// Use structuredClone() or object spreading to create new objects.
+// For each task update:
+// If the task exists, update its completed status.
+// If it doesn’t exist, add a new task with the given id, title, and completed status to the right milestone.
+
+const copyProject = structuredClone(project);
+console.log(copyProject);
+
+const newProject = {...copyProject, milestones: copyProject.milestones.map((milestone) => {
+  const filterBasedOnMilestoneId = taskUpdates.filter((update) => {
+    return update.milestoneId === milestone.id;
+  });
+  const updatedTasks = milestone.tasks.map((task) => {
+    const filterBasedOnTaskId = filterBasedOnMilestoneId.find((u) => {
+      return u.taskId === task.id;
+    });
+    if (filterBasedOnTaskId) {
+      return {...task, completed: filterBasedOnTaskId.completed};
+    }
+    return task;
+  });
+  filterBasedOnMilestoneId.forEach((taskUpdate) => {
+    const alreadyExists = updatedTasks.some((mainTask) => {
+      return taskUpdate.taskId === mainTask.id;
+    });
+    if (!alreadyExists) {
+      updatedTasks.push({id: taskUpdate.taskId, title: taskUpdate.title, completed: taskUpdate.completed});
+    } else{
+      return alreadyExists;
+    }
+  });
+  return {...milestone, tasks: updatedTasks};
+})
+};
+console.log(newProject);
+})();
